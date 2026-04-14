@@ -1,12 +1,12 @@
 <p align="center">
-  <a href="https://emadalsuwat.github.io">
+  <a href="https://salsuwat.github.io">
     <img src="https://img.shields.io/badge/🌐 Website-Visit-blue?style=for-the-badge" />
   </a>
   <a href="mailto:your-email@example.com">
     <img src="https://img.shields.io/badge/📧 Email-Contact-red?style=for-the-badge" />
   </a>
   <a href="tel:+966XXXXXXXXX">
-    <img src="https://img.shields.io/badge/📱 Phone-Call-green?style=for-the-badge" />
+    <img src="https://img.shields.io/badge/📱 Phone-Message-green?style=for-the-badge" />
   </a>
 </p>
 
