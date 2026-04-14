@@ -1,28 +1,44 @@
 <h1 align="center">👋 Sami Saad Alsuwat</h1>
-<h3 align="center">💻 Computer Science Student | Future Developer 🚀</h3>
+<h3 align="center">💻 Software Developer | Computer Science Student 🚀</h3>
 
 <p align="center">
-  <img src="https://readme-typing-svg.herokuapp.com/?lines=Welcome+to+my+GitHub!;Building+my+future+in+tech;Always+learning+🚀&center=true&width=500&height=45">
+  <a href="https://SamiAlsuwat.github.io">
+    🌐 Visit My Website
+  </a>
 </p>
 
-<p align="center">
-  <img src="https://media.giphy.com/media/ZVik7pBtu9dNS/giphy.gif" width="220">
-</p>
+---
 
-<p>
-<img src="https://skillicons.dev/icons?i=java,python,cpp,html,css,js,git,github" />
-</p>
+## 🚀 About Me
+- 🎓 Computer Science Student  
+- 💡 Passionate about Technology & Programming  
+- 🔐 Interested in Cybersecurity  
+- 🌐 Building real-world projects  
 
-<p align="center">
-  <img src="https://github-readme-stats.vercel.app/api?username=YOUR_USERNAME&show_icons=true&theme=tokyonight" />
-  <br>
-  <img src="https://github-readme-stats.vercel.app/api/top-langs/?username=YOUR_USERNAME&layout=compact&theme=tokyonight" />
-</p>
+---
 
-<p align="center">
-  <img src="https://github-profile-trophy.vercel.app/?username=YOUR_USERNAME&theme=tokyonight&row=1&column=6" />
-</p>
+## 🧠 Skills
+- Java  
+- Python  
+- C++  
+- HTML / CSS / JavaScript  
+- Git & GitHub  
 
-<p align="center">
-  ⭐ Follow me for more projects and updates!
-</p>
+---
+
+## 📊 GitHub Stats
+Stats
+
+---
+
+## 📚 Projects
+- 🌐 Course Website: https://SamiAlsuwat.github.io  
+
+---
+
+## 📫 Contact
+- Email: al-suwat@live.com  
+
+---
+
+⭐ Always learning and improving.
