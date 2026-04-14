@@ -1,5 +1,5 @@
 <h1 align="center">👋 Sami Saad Alsuwat</h1>
-<h3 align="center">💻 Software Developer | Computer Science Student 🚀</h3>
+<h3 align="center">💻 Software Developer | Computer Science 🚀</h3>
 
 <p align="center">
   <a href="https://SamiAlsuwat.github.io">
