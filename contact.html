@@ -1,0 +1,208 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Contact Information | Sami Alsuwat</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600&display=swap" rel="stylesheet">
+    
+    <style>
+        :root {
+            --accent-blue: #4fa0e8;
+            --bg-grey: #f0f2f5;
+            --text-dark: #000000;
+            --text-muted: #666666;
+            --white: #ffffff;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            margin: 0;
+            padding: 80px 20px;
+            background-color: var(--white);
+            color: var(--text-dark);
+        }
+
+        .contact-container {
+            max-width: 1100px;
+            margin: 0 auto;
+            display: flex;
+            gap: 60px;
+            flex-wrap: wrap;
+        }
+
+        /* الجزء الأيسر: معلومات التواصل */
+        .contact-details {
+            flex: 1;
+            min-width: 320px;
+        }
+
+        .contact-details h2 {
+            text-transform: uppercase;
+            letter-spacing: 4px;
+            font-size: 1.3rem;
+            margin-bottom: 50px;
+            font-weight: 600;
+        }
+
+        .info-item {
+            display: flex;
+            align-items: center;
+            margin-bottom: 30px;
+            gap: 20px;
+        }
+
+        .icon-box {
+            width: 70px;
+            height: 70px;
+            background-color: var(--bg-grey);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            border-radius: 4px;
+            flex-shrink: 0;
+        }
+
+        .icon-box svg {
+            width: 28px;
+            height: 28px;
+            fill: var(--accent-blue);
+        }
+
+        .info-content {
+            font-size: 0.95rem;
+        }
+
+        .info-content a {
+            color: var(--accent-blue);
+            text-decoration: none;
+            transition: 0.3s;
+        }
+
+        .info-content a:hover {
+            text-decoration: underline;
+        }
+
+        .address-text {
+            color: var(--text-muted);
+            line-height: 1.6;
+        }
+
+        /* الجزء الأيمن: نموذج المراسلة */
+        .contact-form {
+            flex: 1;
+            min-width: 320px;
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        input, textarea {
+            width: 100%;
+            padding: 16px 20px;
+            background-color: var(--bg-grey);
+            border: none;
+            border-radius: 4px;
+            font-family: inherit;
+            font-size: 0.95rem;
+            box-sizing: border-box;
+            outline: none;
+            color: var(--text-dark);
+        }
+
+        textarea {
+            height: 180px;
+            resize: none;
+        }
+
+        input::placeholder, textarea::placeholder {
+            color: #999;
+        }
+
+        .send-btn {
+            background-color: var(--accent-blue);
+            color: var(--white);
+            border: none;
+            padding: 15px 35px;
+            text-transform: uppercase;
+            font-weight: 600;
+            font-size: 0.85rem;
+            letter-spacing: 1.5px;
+            border-radius: 4px;
+            cursor: pointer;
+            align-self: flex-start;
+            margin-top: 10px;
+            transition: background 0.3s ease;
+        }
+
+        .send-btn:hover {
+            background-color: #3b8cd6;
+        }
+
+        /* للتوافق مع الجوال */
+        @media (max-width: 768px) {
+            .contact-container {
+                flex-direction: column;
+                gap: 40px;
+            }
+            body {
+                padding: 40px 20px;
+            }
+        }
+    </style>
+</head>
+<body>
+
+<div class="contact-container">
+    
+    <div class="contact-details">
+        <h2>Contact Information</h2>
+        
+        <div class="info-item">
+            <div class="icon-box">
+                <svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 17.93c-3.95-.49-7-3.85-7-7.93 0-.62.08-1.21.21-1.79L9 15v1c0 1.1.9 2 2 2v1.93zm6.9-2.54c-.26-.81-1-1.39-1.9-1.39h-1v-3c0-.55-.45-1-1-1H8v-2h2c.55 0 1-.45 1-1V7h2c1.1 0 2-.9 2-2v-.41c2.93 1.19 5 4.06 5 7.41 0 2.08-.8 3.97-2.1 5.39z"/></svg>
+            </div>
+            <div class="info-content">
+                <a href="mailto:Al-suwat@live.com">Al-suwat@live.com</a>
+            </div>
+        </div>
+
+        <div class="info-item">
+            <div class="icon-box">
+                <svg viewBox="0 0 24 24"><path d="M12 2c-4.41 0-8 3.59-8 8 0 6 8 14 8 14s8-8 8-14c0-4.41-3.59-8-8-8zm0 11c-1.66 0-3-1.34-3-3s1.34-3 3-3 3 1.34 3 3-1.34 3-3 3z"/></svg>
+            </div>
+            <div class="info-content">
+                <div class="address-text">
+                    Al-Hawiya, Taif, Saudi<br>
+                    Arabia, 21974
+                </div>
+            </div>
+        </div>
+
+        <div class="info-item">
+            <div class="icon-box">
+                <svg viewBox="0 0 24 24"><path d="M6.62 10.79c1.44 2.83 3.76 5.14 6.59 6.59l2.2-2.2c.27-.27.67-.36 1.02-.24 1.12.37 2.33.57 3.57.57.55 0 1 .45 1 1V20c0 .55-.45 1-1 1-9.39 0-17-7.61-17-17 0-.55.45-1 1-1h3.5c.55 0 1 .45 1 1 0 1.25.2 2.45.57 3.57.11.35.03.74-.25 1.02l-2.2 2.2z"/></svg>
+            </div>
+            <div class="info-content">
+                <a href="tel:+966127256620">(+966) 12 7256620</a>
+            </div>
+        </div>
+    </div>
+
+    <div class="contact-form">
+        <form class="form-group">
+            <input type="text" placeholder="Name" required>
+            <input type="email" placeholder="Email" required>
+            <input type="text" placeholder="Subject">
+            <textarea placeholder="Message" required></textarea>
+            <button type="submit" class="send-btn">Send Message</button>
+        </form>
+    </div>
+
+</div>
+
+</body>
+</html>

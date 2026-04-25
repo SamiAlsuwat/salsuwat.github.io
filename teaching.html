@@ -1,105 +1,196 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="ar" dir="rtl">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Sami Alsuwat | Computer Science</title>
+    <title>قائمة المقررات | Emad Alsuwat</title>
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;700&display=swap" rel="stylesheet">
+    
     <style>
-        /* تم تغيير اللون الأساسي هنا من الأزرق إلى الأسود */
-        :root { --primary: #000000; --bg: #f4f7f9; --text: #333; }
-        
-        body { font-family: 'Segoe UI', Arial, sans-serif; line-height: 1.6; color: var(--text); background: var(--bg); margin: 0; padding: 0; }
-        .container { max-width: 1000px; margin: 40px auto; display: grid; grid-template-columns: 300px 1fr; gap: 30px; padding: 20px; }
-        
-        /* Sidebar / Left Column */
-        .sidebar { background: white; padding: 30px; border-radius: 15px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); text-align: center; height: fit-content; }
-        
-        /* تغيير لون الإطار هنا إلى الأسود مباشرة */
-        .profile-img {
-            width: 180px;
-            height: 180px;
-            border-radius: 50%;
-            object-fit: cover;
-            border: 4px solid #000000;
-            margin-bottom: 20px;
-            display: block;
-            margin-left: auto;
-            margin-right: auto;
+        :root {
+            --bg-light: #ffffff;
+            --section-bg: #f8f9fa; /* رمادي فاتح جداً للخلفية */
+            --accent-blue: #4fa0e8;
+            --text-main: #2c3e50;
+            --text-muted: #7f8c8d;
+            --border-color: #ecf0f1;
         }
-        
-        .nav-links { margin-top: 25px; display: flex; flex-direction: column; gap: 10px; }
-        .nav-links a { text-decoration: none; color: var(--text); font-weight: 600; padding: 8px; border-radius: 5px; transition: 0.3s; background: #f8f9fa; }
-        .nav-links a:hover { background: var(--primary); color: white; }
 
-        /* Main Content / Right Column */
-        .main-content { background: white; padding: 40px; border-radius: 15px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); }
-        h1 { margin-top: 0; color: var(--primary); }
-        h2 { border-bottom: 2px solid var(--primary); padding-bottom: 5px; color: var(--primary); margin-top: 30px; }
-        .badge-group { margin: 20px 0; display: flex; flex-wrap: wrap; gap: 8px; }
-        .stats-container img { max-width: 100%; margin-top: 10px; border-radius: 8px; }
-        
-        @media (max-width: 850px) {
-            .container { grid-template-columns: 1fr; }
-            .sidebar { position: relative; }
+        body {
+            font-family: 'Cairo', sans-serif;
+            background-color: var(--section-bg);
+            color: var(--text-main);
+            margin: 0;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 900px;
+            margin: 40px auto;
+            background: var(--bg-light);
+            padding: 30px;
+            border-radius: 12px;
+            border: 1px solid var(--border-color);
+            box-shadow: 0 10px 30px rgba(0,0,0,0.05); /* ظل خفيف جداً */
+        }
+
+        header {
+            text-align: center;
+            border-bottom: 3px solid var(--accent-blue);
+            margin-bottom: 30px;
+            padding-bottom: 20px;
+        }
+
+        header h1 {
+            color: var(--text-main);
+            margin: 0;
+            font-size: 1.8rem;
+            font-weight: 700;
+        }
+
+        header p {
+            color: var(--accent-blue);
+            margin-top: 5px;
+            font-size: 0.9rem;
+        }
+
+        .controls {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 25px;
+        }
+
+        #searchInput {
+            flex: 1;
+            padding: 14px 20px;
+            background-color: #fdfdfd;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            color: var(--text-main);
+            outline: none;
+            transition: 0.3s;
+        }
+
+        #searchInput:focus {
+            border-color: var(--accent-blue);
+            box-shadow: 0 0 8px rgba(79, 160, 232, 0.2);
+        }
+
+        .print-btn {
+            background-color: var(--accent-blue);
+            color: white;
+            border: none;
+            padding: 10px 25px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: 0.3s;
+        }
+
+        .print-btn:hover {
+            opacity: 0.85;
+            transform: translateY(-1px);
+        }
+
+        .table-wrapper {
+            overflow-x: auto;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            text-align: center;
+        }
+
+        thead th {
+            background-color: #fbfbfc;
+            color: var(--accent-blue);
+            padding: 18px;
+            font-size: 1rem;
+            border-bottom: 2px solid var(--border-color);
+        }
+
+        tbody td {
+            padding: 15px;
+            border-bottom: 1px solid var(--border-color);
+            color: var(--text-muted);
+            font-size: 0.95rem;
+        }
+
+        tbody tr:nth-child(even) {
+            background-color: #fafafa;
+        }
+
+        tbody tr:hover {
+            background-color: #f1f7fe; /* تمييز الصف عند التأشير بأزرق خفيف */
+            color: var(--text-main);
+        }
+
+        @media print {
+            body { background: white; padding: 0; }
+            .container { box-shadow: none; border: 1px solid #eee; width: 100%; max-width: none; }
+            .controls, .print-btn { display: none; }
+            thead th { border-bottom: 2px solid #333; }
         }
     </style>
 </head>
 <body>
 
 <div class="container">
-    <aside class="sidebar">
-        <img src="profile.jpg" alt="Sami Alsuwat" class="profile-img">
-        <h3>Sami Alsuwat</h3>
-        <p>IT Lecturer @ Taif University</p>
-        
-        <div class="nav-links">
-            <a href="index.html">🏠 Home</a>
-            <a href="teaching.html">📚 Teaching</a>
-            <a href="bio.html">👤 Bio</a>
-            <a href="contact.html">📧 Contact</a>
-        </div>
-    </aside>
+    <header>
+        <h1>قائمة المقررات الدراسية</h1>
+        <p>الفصل الدراسي الثاني - 1447هـ</p>
+    </header>
 
-    <main class="main-content">
-        <h1>Welcome to my Profile</h1>
-        
-        <div class="badge-group">
-            <a href="https://SamiAlsuwat.github.io"><img src="https://img.shields.io/badge/🌐_Website-Visit-black?style=for-the-badge" alt="Website"></a>
-            <a href="mailto:Al-suwat@live.com"><img src="https://img.shields.io/badge/📧_Email-Contact-red?style=for-the-badge" alt="Email"></a>
-            <a href="https://github.com/Samialsuwat"><img src="https://img.shields.io/badge/💻_GitHub-Follow-black?style=for-the-badge" alt="GitHub"></a>
-        </div>
+    <div class="controls">
+        <input type="text" id="searchInput" placeholder="🔍 ابحث عن مادة، رمز، أو رقم شعبة...">
+        <button class="print-btn" onclick="window.print()">🖨️ طباعة</button>
+    </div>
 
-        <section>
-            <h2>🚀 About Me</h2>
-            <ul>
-                <li>🎓 Computer Science Student</li>
-                <li>💡 Passionate about Software Development</li>
-                <li>🔐 Interested in Cybersecurity</li>
-                <li>🌐 Building real-world projects</li>
-            </ul>
-        </section>
-
-        <section>
-            <h2>🧠 Skills & Tools</h2>
-            <img src="https://skillicons.dev/icons?i=java,python,cpp,html,css,js,git,github&theme=dark" alt="Skills" />
-        </section>
-
-        <section>
-            <h2>📊 GitHub Stats</h2>
-            <div class="stats-container">
-                <img src="https://github-readme-stats.vercel.app/api?username=Samialsuwat&show_icons=true&theme=tokyonight" alt="Stats" />
-                <img src="https://streak-stats.demolab.com/?user=Samialsuwat&theme=tokyonight" alt="Streak" />
-                <img src="https://github-profile-trophy.vercel.app/?username=Samialsuwat&theme=tokyonight&row=1&column=3" alt="Trophies" />
-            </div>
-        </section>
-
-        <section>
-            <h2>📚 Featured Projects</h2>
-            <p><strong>🌐 Course Website:</strong> <a href="https://salsuwat.github.io" style="color:black; font-weight:bold;">salsuwat.github.io</a></p>
-            <p><strong>💻 Web Projects:</strong> Interactive applications built with HTML/CSS/JS.</p>
-        </section>
-    </main>
+    <div class="table-wrapper">
+        <table id="scheduleTable">
+            <thead>
+                <tr>
+                    <th>رمز المقرر</th>
+                    <th>اسم المقرر</th>
+                    <th>النشاط</th>
+                    <th>الشعبة</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr><td>501224-4</td><td>البرمجة الشيئية</td><td>عملي</td><td>268</td></tr>
+                <tr><td>5021201-4</td><td>أساسيات قواعد البيانات</td><td>عملي</td><td>2925</td></tr>
+                <tr><td>502315-3</td><td>نظم الويب</td><td>عملي</td><td>484</td></tr>
+                <tr><td>502321-3</td><td>أساسيات نظم التشغيل</td><td>عملي</td><td>472</td></tr>
+                <tr><td>502321-3</td><td>أساسيات نظم التشغيل</td><td>عملي</td><td>486</td></tr>
+                <tr><td>502321-3</td><td>أساسيات نظم التشغيل</td><td>عملي</td><td>487</td></tr>
+                <tr><td>502321-3</td><td>أساسيات نظم التشغيل</td><td>عملي</td><td>498</td></tr>
+                <tr><td>502321-3</td><td>أساسيات نظم التشغيل</td><td>عملي</td><td>499</td></tr>
+                <tr><td>502372-3</td><td>أساسيات قواعد البيانات</td><td>عملي</td><td>567</td></tr>
+                <tr><td>502373-3</td><td>نظم إدارة قواعد البيانات</td><td>عملي</td><td>504</td></tr>
+                <tr><td>502373-3</td><td>نظم إدارة قواعد البيانات</td><td>عملي</td><td>505</td></tr>
+                <tr><td>502482-3</td><td>أساسيات الشبكات</td><td>عملي</td><td>2518</td></tr>
+                <tr><td>502510-3</td><td>معمارية ودمج الأنظمة</td><td>عملي</td><td>2812</td></tr>
+                <tr><td>502576-3</td><td>قواعد بيانات ذات أغراض خاصة</td><td>عملي</td><td>549</td></tr>
+                <tr><td>502576-3</td><td>قواعد بيانات ذات أغراض خاصة</td><td>عملي</td><td>2875</td></tr>
+                <tr><td>502583-3</td><td>الخوادم والبنية التحتية للشبكات</td><td>عملي</td><td>2516</td></tr>
+                <tr><td>502584-3</td><td>موضوعات متقدمة في الشبكات</td><td>عملي</td><td>543</td></tr>
+                <tr><td>502584-3</td><td>موضوعات متقدمة في الشبكات</td><td>عملي</td><td>554</td></tr>
+                <tr><td>502584-3</td><td>موضوعات متقدمة في الشبكات</td><td>عملي</td><td>555</td></tr>
+            </tbody>
+        </table>
+    </div>
 </div>
+
+<script>
+    document.getElementById('searchInput').addEventListener('keyup', function() {
+        const searchText = this.value.toLowerCase();
+        const rows = document.querySelectorAll('#scheduleTable tbody tr');
+        rows.forEach(row => {
+            row.style.display = row.innerText.toLowerCase().includes(searchText) ? "" : "none";
+        });
+    });
+</script>
 
 </body>
 </html>
