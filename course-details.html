@@ -288,8 +288,12 @@ body::after{
       <div class="field">
         <label>Section | الشعبة</label>
         <select id="regSection">
-          <option value="2925">2925</option>
-          <option value="567">567</option>
+          <option value="1512">1512</option>
+          <option value="1515">1515</option>
+          <option value="572">572</option>
+          <option value="629">629</option>
+          <option value="650">650</option>
+          <option value="651">651</option>
         </select>
       </div>
       <div class="field">
@@ -395,7 +399,8 @@ function saveSession(user) {
 }
 
 function goToCourse() {
-  window.location.href = 'course-details.html?code=5021201-4&name=أساسيات قواعد البيانات';
+  const p = window.location.pathname.replace(/\/[^\/]*$/, '/');
+  window.location.href = window.location.origin + p + 'course-details.html?code=5021201-4&name=%D8%A3%D8%B3%D8%A7%D8%B3%D9%8A%D8%A7%D8%AA%20%D9%82%D9%88%D8%A7%D8%B9%D8%AF%20%D8%A7%D9%84%D8%A8%D9%8A%D8%A7%D9%86%D8%A7%D8%AA';
 }
 
 // ═══════════════════════════════════════════
@@ -541,27 +546,8 @@ function showSuccess(user, isNew) {
   setTimeout(goToCourse, 3000);
 }
 
-// ═══════════════════════════════════════════
-//  AUTO-LOGIN (restore session)
-// ═══════════════════════════════════════════
-window.addEventListener('DOMContentLoaded', async () => {
-  try {
-    const saved = localStorage.getItem('taif_db_current_user');
-    if (saved) {
-      const user = JSON.parse(saved);
-      // Verify still valid in DB
-      const { data } = await sb.from('students').select('id').eq('id', user.id).single();
-      if (data) {
-        // Already logged in — go straight to course
-        goToCourse();
-      } else {
-        localStorage.removeItem('taif_db_current_user');
-      }
-    }
-  } catch(e) {
-    localStorage.removeItem('taif_db_current_user');
-  }
-});
+// AUTO-LOGIN removed — was causing infinite refresh loop.
+// Session is only used by course-details.html to identify the student.
 
 // ═══════════════════════════════════════════
 //  ENTER KEY SUPPORT
