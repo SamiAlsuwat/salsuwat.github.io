@@ -9,7 +9,7 @@
     <style>
         :root {
             --bg-light: #ffffff;
-            --section-bg: #f8f9fa; /* رمادي فاتح جداً للخلفية */
+            --section-bg: #f8f9fa;
             --accent-blue: #4fa0e8;
             --text-main: #2c3e50;
             --text-muted: #7f8c8d;
@@ -25,13 +25,13 @@
         }
 
         .container {
-            max-width: 900px;
+            max-width: 700px; /* تقليل العرض ليناسب المحتوى الأقل */
             margin: 40px auto;
             background: var(--bg-light);
             padding: 30px;
             border-radius: 12px;
             border: 1px solid var(--border-color);
-            box-shadow: 0 10px 30px rgba(0,0,0,0.05); /* ظل خفيف جداً */
+            box-shadow: 0 10px 30px rgba(0,0,0,0.05);
         }
 
         header {
@@ -41,72 +41,35 @@
             padding-bottom: 20px;
         }
 
-        header h1 {
-            color: var(--text-main);
-            margin: 0;
-            font-size: 1.8rem;
-            font-weight: 700;
-        }
-
-        header p {
-            color: var(--accent-blue);
-            margin-top: 5px;
-            font-size: 0.9rem;
-        }
-
-        .controls {
-            display: flex;
-            gap: 15px;
-            margin-bottom: 25px;
-        }
-
         #searchInput {
-            flex: 1;
+            width: 100%;
             padding: 14px 20px;
-            background-color: #fdfdfd;
             border: 1px solid #ddd;
             border-radius: 8px;
-            color: var(--text-main);
             outline: none;
-            transition: 0.3s;
-        }
-
-        #searchInput:focus {
-            border-color: var(--accent-blue);
-            box-shadow: 0 0 8px rgba(79, 160, 232, 0.2);
-        }
-
-        .print-btn {
-            background-color: var(--accent-blue);
-            color: white;
-            border: none;
-            padding: 10px 25px;
-            border-radius: 8px;
-            cursor: pointer;
-            font-weight: 600;
-            transition: 0.3s;
-        }
-
-        .print-btn:hover {
-            opacity: 0.85;
-            transform: translateY(-1px);
-        }
-
-        .table-wrapper {
-            overflow-x: auto;
+            box-sizing: border-box;
+            margin-bottom: 25px;
         }
 
         table {
             width: 100%;
             border-collapse: collapse;
-            text-align: center;
+            text-align: right; /* محاذاة لليمين للنصوص العربية */
+        }
+
+        tbody tr {
+            cursor: pointer;
+            transition: 0.2s;
+        }
+
+        tbody tr:hover {
+            background-color: #f1f7fe !important;
         }
 
         thead th {
             background-color: #fbfbfc;
             color: var(--accent-blue);
             padding: 18px;
-            font-size: 1rem;
             border-bottom: 2px solid var(--border-color);
         }
 
@@ -114,83 +77,135 @@
             padding: 15px;
             border-bottom: 1px solid var(--border-color);
             color: var(--text-muted);
-            font-size: 0.95rem;
         }
 
-        tbody tr:nth-child(even) {
-            background-color: #fafafa;
+        /* تصميم الصفحة الخاصة (Modal) */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0; top: 0;
+            width: 100%; height: 100%;
+            background-color: rgba(0,0,0,0.6);
+            backdrop-filter: blur(5px);
         }
 
-        tbody tr:hover {
-            background-color: #f1f7fe; /* تمييز الصف عند التأشير بأزرق خفيف */
+        .modal-content {
+            background-color: white;
+            margin: 15% auto;
+            padding: 40px;
+            border-radius: 20px;
+            width: 80%;
+            max-width: 400px;
+            position: relative;
+            text-align: center;
+            animation: fadeIn 0.3s ease-out;
+        }
+
+        @keyframes fadeIn {
+            from { transform: scale(0.9); opacity: 0; }
+            to { transform: scale(1); opacity: 1; }
+        }
+
+        .close-btn {
+            position: absolute;
+            top: 15px; left: 20px;
+            font-size: 28px;
+            cursor: pointer;
+            color: #ccc;
+        }
+
+        .modal-header h2 {
+            color: var(--accent-blue);
+            margin: 0 0 20px 0;
+        }
+
+        .info-card {
+            background: #f9f9f9;
+            padding: 15px;
+            border-radius: 10px;
             color: var(--text-main);
+            font-size: 1.1rem;
+            border: 1px solid #eee;
         }
 
-        @media print {
-            body { background: white; padding: 0; }
-            .container { box-shadow: none; border: 1px solid #eee; width: 100%; max-width: none; }
-            .controls, .print-btn { display: none; }
-            thead th { border-bottom: 2px solid #333; }
-        }
+        @media print { .modal, #searchInput { display: none !important; } }
     </style>
 </head>
 <body>
 
 <div class="container">
     <header>
-        <h1>قائمة المقررات الدراسية</h1>
+        <h1>المقررات الدراسية</h1>
         <p>الفصل الدراسي الثاني - 1447هـ</p>
     </header>
 
-    <div class="controls">
-        <input type="text" id="searchInput" placeholder="🔍 ابحث عن مادة، رمز، أو رقم شعبة...">
-        <button class="print-btn" onclick="window.print()">🖨️ طباعة</button>
-    </div>
+    <input type="text" id="searchInput" placeholder="🔍 ابحث عن مادة أو رمز المقرر...">
 
-    <div class="table-wrapper">
-        <table id="scheduleTable">
-            <thead>
-                <tr>
-                    <th>رمز المقرر</th>
-                    <th>اسم المقرر</th>
-                    <th>النشاط</th>
-                    <th>الشعبة</th>
-                </tr>
-            </thead>
-            <tbody>
-                <tr><td>501224-4</td><td>البرمجة الشيئية</td><td>عملي</td><td>268</td></tr>
-                <tr><td>5021201-4</td><td>أساسيات قواعد البيانات</td><td>عملي</td><td>2925</td></tr>
-                <tr><td>502315-3</td><td>نظم الويب</td><td>عملي</td><td>484</td></tr>
-                <tr><td>502321-3</td><td>أساسيات نظم التشغيل</td><td>عملي</td><td>472</td></tr>
-                <tr><td>502321-3</td><td>أساسيات نظم التشغيل</td><td>عملي</td><td>486</td></tr>
-                <tr><td>502321-3</td><td>أساسيات نظم التشغيل</td><td>عملي</td><td>487</td></tr>
-                <tr><td>502321-3</td><td>أساسيات نظم التشغيل</td><td>عملي</td><td>498</td></tr>
-                <tr><td>502321-3</td><td>أساسيات نظم التشغيل</td><td>عملي</td><td>499</td></tr>
-                <tr><td>502372-3</td><td>أساسيات قواعد البيانات</td><td>عملي</td><td>567</td></tr>
-                <tr><td>502373-3</td><td>نظم إدارة قواعد البيانات</td><td>عملي</td><td>504</td></tr>
-                <tr><td>502373-3</td><td>نظم إدارة قواعد البيانات</td><td>عملي</td><td>505</td></tr>
-                <tr><td>502482-3</td><td>أساسيات الشبكات</td><td>عملي</td><td>2518</td></tr>
-                <tr><td>502510-3</td><td>معمارية ودمج الأنظمة</td><td>عملي</td><td>2812</td></tr>
-                <tr><td>502576-3</td><td>قواعد بيانات ذات أغراض خاصة</td><td>عملي</td><td>549</td></tr>
-                <tr><td>502576-3</td><td>قواعد بيانات ذات أغراض خاصة</td><td>عملي</td><td>2875</td></tr>
-                <tr><td>502583-3</td><td>الخوادم والبنية التحتية للشبكات</td><td>عملي</td><td>2516</td></tr>
-                <tr><td>502584-3</td><td>موضوعات متقدمة في الشبكات</td><td>عملي</td><td>543</td></tr>
-                <tr><td>502584-3</td><td>موضوعات متقدمة في الشبكات</td><td>عملي</td><td>554</td></tr>
-                <tr><td>502584-3</td><td>موضوعات متقدمة في الشبكات</td><td>عملي</td><td>555</td></tr>
-            </tbody>
-        </table>
+    <table id="scheduleTable">
+        <thead>
+            <tr>
+                <th>رمز المقرر</th>
+                <th>اسم المقرر</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr><td>501224-4</td><td>البرمجة الشيئية</td></tr>
+            <tr><td>5021201-4</td><td>أساسيات قواعد البيانات</td></tr>
+            <tr><td>502315-3</td><td>نظم الويب</td></tr>
+            <tr><td>502321-3</td><td>أساسيات نظم التشغيل</td></tr>
+            <tr><td>502373-3</td><td>نظم إدارة قواعد البيانات</td></tr>
+            <tr><td>502482-3</td><td>أساسيات الشبكات</td></tr>
+            <tr><td>502510-3</td><td>معمارية ودمج الأنظمة</td></tr>
+            <tr><td>502576-3</td><td>قواعد بيانات ذات أغراض خاصة</td></tr>
+            <tr><td>502583-3</td><td>الخوادم والبنية التحتية للشبكات</td></tr>
+            <tr><td>502584-3</td><td>موضوعات متقدمة في الشبكات</td></tr>
+        </tbody>
+    </table>
+</div>
+
+<div id="courseModal" class="modal">
+    <div class="modal-content">
+        <span class="close-btn">&times;</span>
+        <div class="modal-header">
+            <h2 id="modalTitle">اسم المقرر</h2>
+        </div>
+        <div class="info-card">
+            <span>رمز المقرر: </span>
+            <strong id="modalCode"></strong>
+        </div>
+        <p style="margin-top: 20px; color: #888; font-size: 0.9rem;">سيتم إضافة محتوى المادة هنا قريباً.</p>
     </div>
 </div>
 
 <script>
-    document.getElementById('searchInput').addEventListener('keyup', function() {
+    // نظام البحث
+    document.getElementById('searchInput').addEventListener('input', function() {
         const searchText = this.value.toLowerCase();
         const rows = document.querySelectorAll('#scheduleTable tbody tr');
         rows.forEach(row => {
             row.style.display = row.innerText.toLowerCase().includes(searchText) ? "" : "none";
         });
     });
+
+    // نظام فتح الصفحة الخاصة
+    const modal = document.getElementById('courseModal');
+    const closeBtn = document.querySelector('.close-btn');
+    const rows = document.querySelectorAll('#scheduleTable tbody tr');
+
+    rows.forEach(row => {
+        row.addEventListener('click', function() {
+            const cells = this.querySelectorAll('td');
+            document.getElementById('modalCode').innerText = cells[0].innerText;
+            document.getElementById('modalTitle').innerText = cells[1].innerText;
+            modal.style.display = "block";
+        });
+    });
+
+    closeBtn.onclick = () => modal.style.display = "none";
+    window.onclick = (e) => { if (e.target == modal) modal.style.display = "none"; }
 </script>
 
 </body>
 </html>
+
