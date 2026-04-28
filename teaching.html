@@ -179,7 +179,7 @@
 </div>
 
 <script>
-    // نظام البحث
+    // نظام البحث (يبقى كما هو لخدمة المستخدم)
     document.getElementById('searchInput').addEventListener('input', function() {
         const searchText = this.value.toLowerCase();
         const rows = document.querySelectorAll('#scheduleTable tbody tr');
@@ -188,22 +188,19 @@
         });
     });
 
-    // نظام فتح الصفحة الخاصة
-    const modal = document.getElementById('courseModal');
-    const closeBtn = document.querySelector('.close-btn');
+    // نظام الانتقال للصفحات المستقلة
     const rows = document.querySelectorAll('#scheduleTable tbody tr');
-
     rows.forEach(row => {
         row.addEventListener('click', function() {
             const cells = this.querySelectorAll('td');
-            document.getElementById('modalCode').innerText = cells[0].innerText;
-            document.getElementById('modalTitle').innerText = cells[1].innerText;
-            modal.style.display = "block";
+            const code = cells[0].innerText;
+            const name = cells[1].innerText;
+            
+            // إنشاء رابط يحتوي على بيانات المادة لنقلها للصفحة التالية
+            const url = `course-details.html?code=${encodeURIComponent(code)}&name=${encodeURIComponent(name)}`;
+            window.location.href = url;
         });
     });
-
-    closeBtn.onclick = () => modal.style.display = "none";
-    window.onclick = (e) => { if (e.target == modal) modal.style.display = "none"; }
 </script>
 
 </body>
