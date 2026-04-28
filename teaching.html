@@ -179,30 +179,57 @@
 </div>
 
 <script>
-    // نظام البحث (يبقى كما هو لخدمة المستخدم)
-    document.getElementById('searchInput').addEventListener('input', function() {
-        const searchText = this.value.toLowerCase();
-        const rows = document.querySelectorAll('#scheduleTable tbody tr');
-        rows.forEach(row => {
-            row.style.display = row.innerText.toLowerCase().includes(searchText) ? "" : "none";
-        });
-    });
-
-    // نظام الانتقال للصفحات المستقلة
     const rows = document.querySelectorAll('#scheduleTable tbody tr');
     rows.forEach(row => {
         row.addEventListener('click', function() {
             const cells = this.querySelectorAll('td');
             const code = cells[0].innerText;
-            const name = cells[1].innerText;
+            // التحقق من المادة: إذا كانت قواعد بيانات نرسله لصفحتها، وإلا لصفحة "قريباً"
+            if (code === '5021201-4') {
+                window.location.href = 'db-fundamental-labs.html';
+            }
+            else if (code === '501224-4') {
+                    
+                        window.location.href = 'oop.html';
+                    }
+            else if (code === '502315-3') {
+                      
+                        window.location.href = 'web.html';
+                    }
+            else if (code === '502321-3') {
+                
+                        window.location.href = 'os.html';
+                    }
+            else if (code === '502373-3') {
+                   
+                        window.location.href = 'dbs.html';
+                    }
+            else if (code === '502482-3') {
+                      
+                        window.location.href = 'fn.html';
+                    }
+            else if (code === '502510-3') {
+                       
+                        window.location.href = 'sa.html';
+                    }
+            else if (code === '502576-3') {
+                       
+                        window.location.href = 'sdb.html';
+                    }
+            else if (code === '502583-3') {
+                  
+                        window.location.href = 'sni.html';
+                    }
+        
             
-            // إنشاء رابط يحتوي على بيانات المادة لنقلها للصفحة التالية
-            const url = `course-details.html?code=${encodeURIComponent(code)}&name=${encodeURIComponent(name)}`;
-            window.location.href = url;
+            else {
+                window.location.href = 'course-coming-soon.html';
+            }
         });
     });
 </script>
-
+    });
+</script>
 </body>
 </html>
 
