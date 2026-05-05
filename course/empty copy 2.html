@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Database Fundamentals - Lectures</title>
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #d97706;
+            --bg: #f8fafc;
+            --card: #ffffff;
+            --text: #1e293b;
+            --accent: #fef3c7;
+        }
+        body { font-family: 'Cairo', sans-serif; background: var(--bg); color: var(--text); padding: 20px; line-height: 1.6; }
+        .container { max-width: 800px; margin: 0 auto; }
+        header { text-align: center; margin-bottom: 40px; border-bottom: 3px solid var(--primary); padding-bottom: 20px; }
+        
+        .lecture-card { background: var(--card); border-radius: 15px; padding: 25px; margin-bottom: 30px; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1); border: 1px solid #e2e8f0; }
+        .lecture-title { color: var(--primary); font-size: 1.5rem; margin-bottom: 15px; display: flex; align-items: center; gap: 10px; }
+        
+        .video-container { position: relative; padding-bottom: 56.25%; height: 0; overflow: hidden; border-radius: 10px; background: #000; margin-bottom: 20px; }
+        .video-container iframe { position: absolute; top: 0; left: 0; width: 100%; height: 100%; border: 0; }
+        
+        .quiz-section { background: var(--accent); padding: 20px; border-radius: 10px; margin-top: 20px; }
+        .quiz-header { font-weight: 700; margin-bottom: 10px; border-bottom: 1px solid var(--primary); display: inline-block; }
+        .question { margin-bottom: 15px; font-size: 0.95rem; }
+        .grade-badge { font-size: 10px; background: var(--primary); color: #fff; padding: 2px 6px; border-radius: 4px; vertical-align: middle; }
+        
+        input[type="radio"] { margin-right: 10px; cursor: pointer; }
+        label { cursor: pointer; }
+        .btn-check { background: var(--primary); color: white; border: none; padding: 8px 15px; border-radius: 5px; cursor: pointer; margin-top: 10px; font-family: 'Cairo'; }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <header>
+        <h1>Database Fundamentals Course</h1>
+        <p>College of Computers & IT - Taif University</p>
+    </header>
+
+    <!-- LECTURE 1 -->
+    <div class="lecture-card">
+        <h2 class="lecture-title"><span>01</span> Introduction to Databases</h2>
+        <p>Understanding what a database is and how it differs from traditional file systems.</p>
+        <div class="video-container">
+            <!-- Replace VIDEO_ID with actual YouTube ID -->
+            <iframe src="https://www.youtube.com/embed/VIDEO_ID_1" allowfullscreen></iframe>
+        </div>
+        <div class="quiz-section">
+            <span class="quiz-header">Lecture Quiz (6 Grades Total)</span>
+            <div class="question">
+                <p>1. What is the primary purpose of a DBMS? <span class="grade-badge">2 Grades</span></p>
+                <label><input type="radio" name="q1"> Storing images only</label><br>
+                <label><input type="radio" name="q1"> Managing and organizing data efficiently</label>
+            </div>
+            <div class="question">
+                <p>2. Which of the following is an example of structured data? <span class="grade-badge">2 Grades</span></p>
+                <label><input type="radio" name="q2"> SQL Table</label><br>
+                <label><input type="radio" name="q2"> Handwritten note</label>
+            </div>
+            <div class="question">
+                <p>3. Metadata is defined as: <span class="grade-badge">2 Grades</span></p>
+                <label><input type="radio" name="q3"> Large data</label><br>
+                <label><input type="radio" name="q3"> Data about data</label>
+            </div>
+        </div>
+    </div>
+
+    <!-- LECTURE 2 -->
+    <div class="lecture-card">
+        <h2 class="lecture-title"><span>02</span> The Relational Model</h2>
+        <p>Introduction to tables, rows (tuples), and columns (attributes).</p>
+        <div class="video-container">
+            <iframe src="https://www.youtube.com/embed/VIDEO_ID_2" allowfullscreen></iframe>
+        </div>
+        <div class="quiz-section">
+            <span class="quiz-header">Lecture Quiz (6 Grades Total)</span>
+            <div class="question">
+                <p>1. In a relational table, a row is also called a: <span class="grade-badge">2 Grades</span></p>
+                <label><input type="radio" name="q4"> Attribute</label><br>
+                <label><input type="radio" name="q4"> Tuple</label>
+            </div>
+            <div class="question">
+                <p>2. A column in a table represents a: <span class="grade-badge">2 Grades</span></p>
+                <label><input type="radio" name="q5"> Entity</label><br>
+                <label><input type="radio" name="q5"> Attribute</label>
+            </div>
+            <div class="question">
+                <p>3. What identifies every record in a table uniquely? <span class="grade-badge">2 Grades</span></p>
+                <label><input type="radio" name="q6"> Primary Key</label><br>
+                <label><input type="radio" name="q6"> Foreign Key</label>
+            </div>
+        </div>
+    </div>
+
+    <!-- LECTURE 3 -->
+    <div class="lecture-card">
+        <h2 class="lecture-title"><span>03</span> Entity Relationship Diagram (ERD)</h2>
+        <p>Learning how to model data using entities and relationships.</p>
+        <div class="video-container">
+            <iframe src="https://www.youtube.com/embed/VIDEO_ID_3" allowfullscreen></iframe>
+        </div>
+        <div class="quiz-section">
+            <div class="question">
+                <p>1. A rectangle in an ERD represents: <span class="grade-badge">2 Grades</span></p>
+                <label><input type="radio" name="q7"> Relationship</label><br>
+                <label><input type="radio" name="q7"> Entity</label>
+            </div>
+            <div class="question">
+                <p>2. Which symbol represents a Relationship? <span class="grade-badge">2 Grades</span></p>
+                <label><input type="radio" name="q8"> Diamond</label><br>
+                <label><input type="radio" name="q8"> Oval</label>
+            </div>
+            <div class="question">
+                <p>3. A "Student" takes a "Course" is an example of: <span class="grade-badge">2 Grades</span></p>
+                <label><input type="radio" name="q9"> Attribute</label><br>
+                <label><input type="radio" name="q9"> Relationship</label>
+            </div>
+        </div>
+    </div>
+
+    <!-- LECTURE 4 -->
+    <div class="lecture-card">
+        <h2 class="lecture-title"><span>04</span> SQL Basics - DDL</h2>
+        <p>Using SQL to create tables and define structures (CREATE, ALTER, DROP).</p>
+        <div class="video-container">
+            <iframe src="https://www.youtube.com/embed/VIDEO_ID_4" allowfullscreen></iframe>
+        </div>
+        <div class="quiz-section">
+            <div class="question">
+                <p>1. Which command is used to create a new table? <span class="grade-badge">2 Grades</span></p>
+                <label><input type="radio" name="q10"> MAKE TABLE</label><br>
+                <label><input type="radio" name="q10"> CREATE TABLE</label>
+            </div>
+            <div class="question">
+                <p>2. DDL stands for: <span class="grade-badge">2 Grades</span></p>
+                <label><input type="radio" name="q11"> Data Definition Language</label><br>
+                <label><input type="radio" name="q11"> Data Direct Link</label>
+            </div>
+            <div class="question">
+                <p>3. To remove a table from the database, we use: <span class="grade-badge">2 Grades</span></p>
+                <label><input type="radio" name="q12"> DROP</label><br>
+                <label><input type="radio" name="q12"> DELETE</label>
+            </div>
+        </div>
+    </div>
+
+    <!-- LECTURE 5 -->
+    <div class="lecture-card">
+        <h2 class="lecture-title"><span>05</span> SQL Basics - DML</h2>
+        <p>Manipulating data within tables (INSERT, UPDATE, DELETE, SELECT).</p>
+        <div class="video-container">
+            <iframe src="https://www.youtube.com/embed/VIDEO_ID_5" allowfullscreen></iframe>
+        </div>
+        <div class="quiz-section">
+            <div class="question">
+                <p>1. To retrieve data from a table, we use: <span class="grade-badge">2 Grades</span></p>
+                <label><input type="radio" name="q13"> SELECT</label><br>
+                <label><input type="radio" name="q13"> GET</label>
+            </div>
+            <div class="question">
+                <p>2. Which clause is used to filter records? <span class="grade-badge">2 Grades</span></p>
+                <label><input type="radio" name="q14"> WHERE</label><br>
+                <label><input type="radio" name="q14"> IF</label>
+            </div>
+            <div class="question">
+                <p>3. To modify existing data, we use: <span class="grade-badge">2 Grades</span></p>
+                <label><input type="radio" name="q15"> CHANGE</label><br>
+                <label><input type="radio" name="q15"> UPDATE</label>
+            </div>
+        </div>
+    </div>
+
+    <!-- LECTURE 6 -->
+    <div class="lecture-card">
+        <h2 class="lecture-title"><span>06</span> Database Normalization</h2>
+        <p>Organizing data to reduce redundancy (1NF, 2NF, 3NF).</p>
+        <div class="video-container">
+            <iframe src="https://www.youtube.com/embed/VIDEO_ID_6" allowfullscreen></iframe>
+        </div>
+        <div class="quiz-section">
+            <div class="question">
+                <p>1. Normalization is used to: <span class="grade-badge">2 Grades</span></p>
+                <label><input type="radio" name="q16"> Increase data redundancy</label><br>
+                <label><input type="radio" name="q16"> Reduce data redundancy</label>
+            </div>
+            <div class="question">
+                <p>2. A table with no repeating groups is in: <span class="grade-badge">2 Grades</span></p>
+                <label><input type="radio" name="q17"> 1st Normal Form (1NF)</label><br>
+                <label><input type="radio" name="q17"> 2nd Normal Form (2NF)</label>
+            </div>
+            <div class="question">
+                <p>3. Functional dependency is a key concept in normalization. <span class="grade-badge">2 Grades</span></p>
+                <label><input type="radio" name="q18"> True</label><br>
+                <label><input type="radio" name="q18"> False</label>
+            </div>
+        </div>
+    </div>
+
+</div>
+
+</body>
+</html>

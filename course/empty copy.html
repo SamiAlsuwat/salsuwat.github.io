@@ -1,1 +1,330 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Taif University – Database Course System</title>
+<link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;900&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
+<style>
+  *{box-sizing:border-box;margin:0;padding:0}
+  :root {
+    --s900: #f8fafc; --s800: #ffffff; --s750: #f1f5f9; --s700: #e2e8f0;
+    --s600: #94a3b8; --s400: #64748b; --s300: #1e293b;
+    --a600: #d97706; --a500: #f59e0b; --a400: #b45309; --a200: #fef3c7;
+    --em: #059669; --re: #dc2626; --r: 14px;
+  }
 
+  body {
+    font-family: 'Cairo', sans-serif;
+    background-color: var(--s900);
+    color: var(--s300);
+    min-height: 100vh;
+    padding: 20px;
+    display: flex; justify-content: center;
+  }
+
+  .panel { width: 100%; max-width: 850px; }
+
+  /* VIEWS */
+  .view { display: none; animation: fadeUp .3s ease; }
+  .view.active { display: block; }
+  @keyframes fadeUp { from { opacity: 0; transform: translateY(14px); } to { opacity: 1; transform: translateY(0); } }
+
+  /* UI COMPONENTS */
+  .card { background: var(--s800); border: 1px solid var(--s700); border-radius: 20px; padding: 30px; box-shadow: 0 10px 15px -3px rgba(0,0,0,0.05); margin-bottom: 25px; }
+  .logo-wrap { text-align: center; margin-bottom: 30px; }
+  .logo { width: 70px; height: 70px; background: var(--a600); border-radius: 18px; display: inline-flex; align-items: center; justify-content: center; font-size: 24px; font-weight: 900; color: #fff; margin-bottom: 10px; }
+  
+  /* FORM STYLES */
+  .field { margin-bottom: 15px; }
+  .field label { display: block; font-size: 13px; font-weight: 700; margin-bottom: 5px; }
+  .field input, .field select { width: 100%; padding: 12px; border: 1px solid var(--s700); border-radius: 10px; font-family: 'Cairo'; outline: none; }
+  .field input:focus { border-color: var(--a600); }
+  
+  /* LECTURE CONTENT STYLES */
+  .lecture-header { border-left: 5px solid var(--a600); padding-left: 15px; margin-bottom: 20px; }
+  .lecture-header h3 { color: var(--a600); }
+  .video-container { position: relative; padding-bottom: 56.25%; height: 0; border-radius: 12px; overflow: hidden; background: #000; margin-bottom: 20px; border: 1px solid var(--s700); }
+  .video-container iframe { position: absolute; top: 0; left: 0; width: 100%; height: 100%; border: 0; }
+  
+  .quiz-section { background: var(--s750); padding: 20px; border-radius: 12px; border: 1px dashed var(--s600); }
+  .q-item { margin-bottom: 20px; }
+  .q-text { font-weight: 700; margin-bottom: 8px; display: block; font-size: 15px; }
+  .grade-tag { font-size: 11px; background: var(--a600); color: white; padding: 2px 6px; border-radius: 4px; margin-left: 10px; }
+
+  /* BUTTONS */
+  .btn-primary { width: 100%; padding: 14px; background: var(--a600); border: none; color: #fff; border-radius: var(--r); font-weight: 700; cursor: pointer; font-family: 'Cairo'; transition: 0.2s; font-size: 16px; }
+  .btn-primary:hover { background: var(--a500); transform: translateY(-1px); }
+  .btn-outline { width: 100%; padding: 14px; background: transparent; border: 2px solid var(--s700); border-radius: var(--r); font-weight: 700; cursor: pointer; margin-top: 10px; font-family: 'Cairo'; color: var(--s400); }
+  .btn-outline:hover { background: var(--s750); color: var(--s300); }
+
+  .alert { padding: 12px; border-radius: 8px; margin-bottom: 15px; font-size: 14px; display: none; text-align: center; }
+  .alert-err { background: #fee2e2; color: #dc2626; border: 1px solid #fecaca; }
+  
+  .badge-row { display: flex; gap: 10px; justify-content: center; margin-top: 10px; }
+  .badge { padding: 4px 12px; border-radius: 20px; font-size: 12px; font-weight: 700; background: var(--a200); color: var(--a400); }
+
+  @media (max-width: 600px) { .card { padding: 20px; } }
+</style>
+</head>
+<body>
+
+<div class="panel">
+
+  <!-- 1. LOGIN VIEW -->
+  <div id="loginView" class="view active">
+    <div class="logo-wrap">
+      <div class="logo">TU</div>
+      <h1>Student Login</h1>
+      <div class="badge-row">
+        <span class="badge">Taif University</span>
+        <span class="badge">Computer Science</span>
+      </div>
+    </div>
+    <div class="card">
+      <div id="loginError" class="alert alert-err"></div>
+      <div class="field">
+        <label>Student Number (8 Digits) | الرقم الجامعي</label>
+        <input type="text" id="loginNum" placeholder="e.g. 44100000" maxlength="8">
+      </div>
+      <div class="field">
+        <label>Password | كلمة المرور</label>
+        <input type="password" id="loginPass" placeholder="••••••••">
+      </div>
+      <button class="btn-primary" id="loginBtn" onclick="handleLogin()">Sign In | دخول</button>
+      <button class="btn-outline" onclick="show('registerView')">Don't have an account? Register</button>
+    </div>
+  </div>
+
+  <!-- 2. REGISTER VIEW -->
+  <div id="registerView" class="view">
+    <div class="card">
+      <h2 style="margin-bottom:20px; text-align:center">Create Student Account</h2>
+      <div id="regError" class="alert alert-err"></div>
+      <div class="field">
+        <label>Full Name | الاسم الكامل</label>
+        <input type="text" id="regName" placeholder="Enter your full name">
+      </div>
+      <div class="field">
+        <label>Student Number | الرقم الجامعي</label>
+        <input type="text" id="regNum" maxlength="8" placeholder="8 digits">
+      </div>
+      <div class="field">
+        <label>Section | الشعبة</label>
+        <select id="regSection">
+          <option value="2925">2925</option>
+          <option value="567">567</option>
+          <option value="600">600</option>
+        </select>
+      </div>
+      <div class="field">
+        <label>Password | كلمة المرور</label>
+        <input type="password" id="regPass" placeholder="Create a password">
+      </div>
+      <button class="btn-primary" id="regBtn" onclick="handleRegister()">Register Account</button>
+      <button class="btn-outline" onclick="show('loginView')">Back to Login</button>
+    </div>
+  </div>
+
+  <!-- 3. COURSE DASHBOARD -->
+  <div id="courseView" class="view">
+    <header class="card" style="text-align:center; border-bottom: 4px solid var(--a600)">
+      <h2 id="welcomeMsg" style="margin-bottom: 5px;">Welcome!</h2>
+      <p id="studentDetail" style="color: var(--s400); font-size: 14px;"></p>
+    </header>
+
+    <!-- LECTURE 1 -->
+    <div class="card">
+      <div class="lecture-header">
+        <h3>1. Introduction to Databases</h3>
+        <p>Understanding DBMS and Data vs Information.</p>
+      </div>
+      <div class="video-container">
+        <iframe src="https://www.youtube.com/embed/wR0jg0eQsbc"></iframe>
+      </div>
+      <div class="quiz-section">
+        <div class="q-item">
+          <span class="q-text">1. What is the main purpose of a DBMS? <span class="grade-tag">2 Grades</span></span>
+          <label><input type="radio" name="l1q1"> To store and manage data efficiently</label><br>
+          <label><input type="radio" name="l1q1"> To create document files</label>
+        </div>
+        <div class="q-item">
+          <span class="q-text">2. Metadata is defined as: <span class="grade-tag">2 Grades</span></span>
+          <label><input type="radio" name="l1q2"> Data about data</label><br>
+          <label><input type="radio" name="l1q2"> Encrypted data</label>
+        </div>
+        <div class="q-item">
+          <span class="q-text">3. Which is an example of a DBMS? <span class="grade-tag">2 Grades</span></span>
+          <label><input type="radio" name="l1q3"> Oracle</label><br>
+          <label><input type="radio" name="l1q3"> Google Chrome</label>
+        </div>
+        <button class="btn-primary" style="width:auto; padding: 8px 25px;" onclick="saveProgress('Lecture 1')">Save Quiz 1</button>
+      </div>
+    </div>
+
+    <!-- LECTURE 2 -->
+    <div class="card">
+      <div class="lecture-header">
+        <h3>2. The Relational Model</h3>
+        <p>Entities, Attributes, and Primary Keys.</p>
+      </div>
+      <div class="video-container">
+        <iframe src="https://www.youtube.com/embed/O753uuutqH8"></iframe>
+      </div>
+      <div class="quiz-section">
+        <div class="q-item">
+          <span class="q-text">1. A unique identifier for a row is a: <span class="grade-tag">2 Grades</span></span>
+          <label><input type="radio" name="l2q1"> Primary Key</label><br>
+          <label><input type="radio" name="l2q1"> Foreign Key</label>
+        </div>
+        <div class="q-item">
+          <span class="q-text">2. In a table, a column represents an: <span class="grade-tag">2 Grades</span></span>
+          <label><input type="radio" name="l2q2"> Attribute</label><br>
+          <label><input type="radio" name="l2q2"> Tuple</label>
+        </div>
+        <div class="q-item">
+          <span class="q-text">3. A row in a relational table is called: <span class="grade-tag">2 Grades</span></span>
+          <label><input type="radio" name="l2q3"> Record/Tuple</label><br>
+          <label><input type="radio" name="l2q3"> Field</label>
+        </div>
+        <button class="btn-primary" style="width:auto; padding: 8px 25px;" onclick="saveProgress('Lecture 2')">Save Quiz 2</button>
+      </div>
+    </div>
+
+    <!-- LECTURE 3: ER Diagrams -->
+    <div class="card">
+      <div class="lecture-header"><h3>3. ER Diagrams</h3></div>
+      <div class="video-container"><iframe src="https://www.youtube.com/embed/QpsNdgkonuo"></iframe></div>
+      <div class="quiz-section">
+        <div class="q-item">
+          <span class="q-text">1. Which shape represents an Entity? <span class="grade-tag">2 Grades</span></span>
+          <label><input type="radio" name="l3q1"> Rectangle</label><br>
+          <label><input type="radio" name="l3q1"> Diamond</label>
+        </div>
+        <button class="btn-primary" style="width:auto; padding: 8px 25px;">Save Quiz 3</button>
+      </div>
+    </div>
+
+    <!-- LECTURE 4: SQL Basics -->
+    <div class="card">
+      <div class="lecture-header"><h3>4. SQL Fundamentals</h3></div>
+      <div class="video-container"><iframe src="https://www.youtube.com/embed/HXV3zeQKqGY"></iframe></div>
+      <div class="quiz-section">
+        <div class="q-item">
+          <span class="q-text">1. Which command retrieves data? <span class="grade-tag">2 Grades</span></span>
+          <label><input type="radio" name="l4q1"> SELECT</label><br>
+          <label><input type="radio" name="l4q1"> INSERT</label>
+        </div>
+        <button class="btn-primary" style="width:auto; padding: 8px 25px;">Save Quiz 4</button>
+      </div>
+    </div>
+
+    <!-- LECTURE 5: Normalization -->
+    <div class="card">
+      <div class="lecture-header"><h3>5. Normalization</h3></div>
+      <div class="video-container"><iframe src="https://www.youtube.com/embed/UrYLYV7WSHM"></iframe></div>
+      <button class="btn-primary" style="width:auto; padding: 8px 25px;">Complete Quiz 5</button>
+    </div>
+
+    <!-- LECTURE 6: Advanced SQL -->
+    <div class="card">
+      <div class="lecture-header"><h3>6. Joins & Relationships</h3></div>
+      <div class="video-container"><iframe src="https://www.youtube.com/embed/9yeOJ0Z3pmw"></iframe></div>
+      <button class="btn-primary" style="width:auto; padding: 8px 25px;">Complete Quiz 6</button>
+    </div>
+
+    <button class="btn-outline" onclick="location.reload()" style="margin-bottom: 50px;">Log Out | تسجيل الخروج</button>
+  </div>
+
+</div>
+
+<script>
+  // SUPABASE CONFIG
+  const { createClient } = supabase;
+  const sb = createClient(
+    'https://xpratnlbivtubelufvbt.supabase.co',
+    'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InhwcmF0bmxiaXZ0dWJlbHVmdmJ0Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzczNjEwNjksImV4cCI6MjA5MjkzNzA2OX0.4e3HYcmageG_-FTTiApcc_DZ2N0ofVdJzlEI25AsvqQ'
+  );
+
+  function show(id) {
+    document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
+    document.getElementById(id).classList.add('active');
+    window.scrollTo(0,0);
+  }
+
+  function toggleLoading(btnId, isLoading) {
+    const btn = document.getElementById(btnId);
+    btn.disabled = isLoading;
+    btn.style.opacity = isLoading ? "0.6" : "1";
+  }
+
+  async function handleLogin() {
+    const num = document.getElementById('loginNum').value.trim();
+    const pass = document.getElementById('loginPass').value;
+    const errorEl = document.getElementById('loginError');
+    
+    errorEl.style.display = "none";
+    if(!num || !pass) {
+      errorEl.textContent = "ID and Password required";
+      errorEl.style.display = "block";
+      return;
+    }
+
+    toggleLoading('loginBtn', true);
+    const { data, error } = await sb.from('students').select('*').eq('student_number', num).single();
+    toggleLoading('loginBtn', false);
+
+    if (error || !data || data.password !== pass) {
+      errorEl.textContent = "Invalid credentials. Please register if new.";
+      errorEl.style.display = "block";
+    } else {
+      launchCourse(data);
+    }
+  }
+
+  async function handleRegister() {
+    const name = document.getElementById('regName').value.trim();
+    const num = document.getElementById('regNum').value.trim();
+    const sec = document.getElementById('regSection').value;
+    const pass = document.getElementById('regPass').value;
+    const errorEl = document.getElementById('regError');
+
+    errorEl.style.display = "none";
+    if(!name || num.length !== 8 || !pass) {
+      errorEl.textContent = "Complete all fields (ID must be 8 digits)";
+      errorEl.style.display = "block";
+      return;
+    }
+
+    toggleLoading('regBtn', true);
+    const { data, error } = await sb.from('students').insert([{
+      student_name: name,
+      student_number: num,
+      section_number: sec,
+      password: pass,
+      total_score: 0
+    }]).select().single();
+    toggleLoading('regBtn', false);
+
+    if (error) {
+      errorEl.textContent = "ID already exists or network error.";
+      errorEl.style.display = "block";
+    } else {
+      launchCourse(data);
+    }
+  }
+
+  function launchCourse(user) {
+    document.getElementById('welcomeMsg').textContent = `Welcome, ${user.student_name}!`;
+    document.getElementById('studentDetail').textContent = `Student ID: ${user.student_number} | Section: ${user.section_number}`;
+    show('courseView');
+  }
+
+  function saveProgress(lec) {
+    alert(lec + " answers saved to your profile!");
+  }
+</script>
+
+</body>
+</html>
