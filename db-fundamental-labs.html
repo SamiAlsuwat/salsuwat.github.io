@@ -1,426 +1,2724 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Taif University – Database Course</title>
-<link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;900&display=swap" rel="stylesheet">
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
-<style>
-*{box-sizing:border-box;margin:0;padding:0}
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Introduction to Database - Taif University | مقدمة في قواعد البيانات</title>
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🐬</text></svg>">
 
-:root {
-  /* LIGHT THEME COLORS */
-  --s900: #f8fafc; /* Main Background (White/Off-white) */
-  --s800: #ffffff; /* Card Background */
-  --s750: #f1f5f9; /* Subtle Hover */
-  --s700: #e2e8f0; /* Borders */
-  --s600: #94a3b8; /* Muted Text */
-  --s400: #64748b; /* Secondary Text */
-  --s300: #1e293b; /* Primary Bold Text */
-  
-  /* ACCENT COLORS (Taif University Identity) */
-  --a600: #d97706;
-  --a500: #f59e0b;
-  --a400: #b45309; /* Darker amber for text readability on white */
-  --a200: #fef3c7;
-  
-  /* STATUS COLORS */
-  --em: #059669;
-  --re: #dc2626;
-  --re-bg: #fee2e2;
-  --re-bd: #fecaca;
-  --em-bg: #ecfdf5;
-  --em-bd: #d1fae5;
-  --r: 14px;
-}
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Arabic:wght@400;600;700&display=swap" rel="stylesheet">
 
-body {
-  font-family: 'Cairo', sans-serif;
-  background-color: var(--s900);
-  background-image:
-    radial-gradient(at 0% 0%, rgba(245, 158, 11, 0.05) 0px, transparent 50%),
-    radial-gradient(at 100% 100%, rgba(59, 130, 246, 0.05) 0px, transparent 50%);
-  color: var(--s300);
-  min-height: 100vh;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  padding: 20px;
-  overflow-x: hidden;
-}
+  <!-- Tailwind via Play CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: { extend: { fontFamily: { 'arabic': ['Noto Sans Arabic', 'Tahoma', 'sans-serif'] } } }
+    };
+  </script>
 
-/* PANEL */
-.panel{position:relative;z-index:1;width:100%;max-width:440px}
+  <style>
+    body { margin: 0; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif; }
+    .font-arabic { font-family: 'Noto Sans Arabic', Tahoma, Arial, sans-serif; }
+    html { scroll-behavior: smooth; }
+    ::-webkit-scrollbar { width: 8px; }
+    ::-webkit-scrollbar-track { background: #1e293b; }
+    ::-webkit-scrollbar-thumb { background: #475569; border-radius: 4px; }
+  </style>
 
-/* VIEWS */
-.view{display:none;animation:fadeUp .3s ease}
-.view.active{display:block}
-@keyframes fadeUp{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:translateY(0)}}
+  <!-- React + ReactDOM (production UMD) -->
+  <script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+  <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
 
-/* ── LANDING ── */
-.logo-wrap{text-align:center;margin-bottom:32px}
-.logo{
-  width:80px;height:80px;background:var(--a600);
-  border-radius:20px;display:inline-flex;
-  align-items:center;justify-content:center;
-  font-size:26px;font-weight:900;color:#fff;
-  margin-bottom:16px;
-  box-shadow: 0 10px 25px -5px rgba(217, 119, 6, 0.3);
-}
-.logo-wrap h1{font-size:24px;font-weight:700;margin-bottom:4px; color: var(--s300)}
-.logo-wrap .univ{font-size:14px;color:var(--a400);direction:rtl;font-weight:700}
-.logo-wrap .dept{font-size:12px;color:var(--s400);margin-top:4px}
+  <!-- Supabase JS (UMD) -->
+  <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
 
-.course-badge{
-  background:var(--s800);border:1px solid var(--s700);
-  border-radius:10px;padding:14px 18px;margin-bottom:32px;
-  display:flex;align-items:center;gap:14px;
-  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
-}
-.cb-icon{
-  width:44px;height:44px;background:var(--a200);
-  border-radius:10px;display:flex;align-items:center;justify-content:center;
-  font-size:20px;flex-shrink:0;
-}
-.cb-code{font-size:12px;color:var(--a400);font-weight:700}
-.cb-name{font-size:15px;font-weight:700; color: var(--s300)}
-.cb-ar{font-size:12px;color:var(--s400);direction:rtl;margin-top:2px}
-
-.landing-btns{display:flex;flex-direction:column;gap:12px}
-.btn-signin{
-  width:100%;padding:15px;
-  background: var(--a600);
-  border:none;color:#fff;font-size:16px;font-weight:700;
-  font-family:'Cairo',sans-serif;border-radius:var(--r);
-  cursor:pointer;transition:.2s;
-}
-.btn-signin:hover{background: var(--a500); transform:translateY(-2px)}
-
-.btn-register{
-  width:100%;padding:15px;
-  background: #fff;
-  border: 2px solid var(--s700);color:var(--s300);
-  font-size:16px;font-weight:700;
-  font-family:'Cairo',sans-serif;border-radius:var(--r);
-  cursor:pointer;transition:.2s;
-}
-.btn-register:hover{border-color:var(--a500); background: var(--s900)}
-
-.footer-txt{text-align:center;font-size:12px;color:var(--s600);margin-top:28px}
-.footer-txt span{color:var(--s300); font-weight: 700}
-
-/* ── CARD ── */
-.card{
-  background: var(--s800);
-  border: 1px solid var(--s700);
-  border-radius:20px;
-  padding:32px 28px;
-  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.05);
-}
-.card-hdr{text-align:center;margin-bottom:24px}
-.card-hdr .back{
-  display:inline-flex;align-items:center;gap:6px;
-  background:none;border:none;color:var(--s400);
-  font-size:13px;font-family:'Cairo',sans-serif;
-  cursor:pointer;margin-bottom:16px;
-}
-.card-hdr .back:hover{color:var(--a600)}
-.card-icon{
-  width:56px;height:56px;background:var(--a200);
-  border-radius:14px;display:inline-flex;
-  align-items:center;justify-content:center;
-  font-size:22px;margin-bottom:12px;
-}
-.card-hdr h2{font-size:20px;font-weight:700;margin-bottom:3px; color: var(--s300)}
-.card-hdr .sub{font-size:13px;color:var(--a400);font-weight:600;direction:rtl}
-
-/* FORM */
-.field{margin-bottom:16px}
-.field label{display:block;font-size:13px;color:var(--s300);margin-bottom:6px;font-weight:700}
-.field input,.field select{
-  width:100%;padding:12px 16px;
-  background: var(--s900);
-  border: 1px solid var(--s700);
-  border-radius:10px;color: var(--s300);
-  font-size:14px;font-family:'Cairo',sans-serif;
-  outline:none;transition: 0.2s;
-}
-.field input:focus,.field select:focus{border-color:var(--a600); background: #fff; box-shadow: 0 0 0 4px var(--a200)}
-
-.alert{
-  display:flex;align-items:flex-start;gap:8px;
-  padding:11px 14px;border-radius:9px;
-  font-size:13px;line-height:1.5;margin-bottom:14px;
-}
-.alert-err{background:var(--re-bg); border:1px solid var(--re-bd); color:var(--re)}
-.alert-ok{background:var(--em-bg); border:1px solid var(--em-bd); color:var(--em)}
-
-.submit-btn{
-  width:100%;padding:14px;margin-top:6px;
-  background:var(--a600);border:none;
-  color:#fff;font-size:15px;font-weight:700;
-  font-family:'Cairo',sans-serif;border-radius:var(--r);
-  cursor:pointer;transition:.2s;
-  display:flex;align-items:center;justify-content:center;gap:8px;
-}
-.submit-btn:hover:not(:disabled){background:var(--a500)}
-.submit-btn.green{background:var(--em)}
-
-.spinner{
-  width:18px;height:18px;border:2.5px solid rgba(255,255,255,.3);
-  border-top-color:#fff;border-radius:50%;
-  animation:spin .65s linear infinite;
-}
-@keyframes spin{to{transform:rotate(360deg)}}
-
-.switch-txt{text-align:center;font-size:13px;color:var(--s400);margin-top:20px}
-.switch-txt button{
-  background:none;border:none;color:var(--a600);
-  font-weight:700;font-family:'Cairo',sans-serif;
-  cursor:pointer;font-size:13px;
-}
-
-/* SUCCESS */
-#successView .card{text-align:center}
-.success-icon{font-size:60px;display:block;margin-bottom:16px}
-.success-name{font-size:20px;font-weight:700;margin-bottom:4px;color:var(--s300)}
-.success-info{font-size:13px;color:var(--s600);margin-bottom:24px}
-.redirect-bar{background:var(--s750);border-radius:8px;height:6px;overflow:hidden;margin-top:16px}
-.redirect-fill{height:100%;background:var(--a500);animation:fillbar 3s linear forwards}
-@keyframes fillbar{from{width:0}to{width:100%}}
-
-@media(max-width:480px){
-  .card{padding:24px 18px}
-}
-</style>
+  <!-- Babel Standalone for in-browser JSX compilation -->
+  <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
 </head>
 <body>
+  <div id="root"></div>
 
-<div class="panel">
+  <script type="text/babel" data-presets="react">
+    // ---- React hooks shortcuts ----
+    const { useState, useEffect, useMemo, useRef, useCallback } = React;
 
-  <div id="landingView" class="view active">
-    <div class="logo-wrap">
-      <div class="logo">TU</div>
-      <h1>Taif University</h1>
-      <div class="univ">جامعة الطائف</div>
-      <div class="dept">College of Computers & Information Technology</div>
+    // ---- Supabase client ----
+    const SUPABASE_URL = 'https://zxqpcuncbpzxsaqmfcby.supabase.co';
+    const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inp4cXBjdW5jYnB6eHNhcW1mY2J5Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzA4Mjk5NzYsImV4cCI6MjA4NjQwNTk3Nn0.Bdt0xkGJ1BxuwCitZ9doxTKzbuUvJfS52yygEY7l0aw';
+    const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+    // ============================================================
+    //  Page Components
+    // ============================================================
+
+    // ---- LoginPage ----
+
+const LoginPage = ({ onNavigate, onLogin }) => {
+  const [studentNumber, setStudentNumber] = useState('');
+  const [password, setPassword] = useState('');
+  const [error, setError] = useState('');
+  const [loading, setLoading] = useState(false);
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    setError('');
+    setLoading(true);
+
+    try {
+      const result = await onLogin(studentNumber, password);
+      if (!result.success) {
+        setError(result.message || 'Login failed. Please try again.');
+      }
+    } catch (err) {
+      console.error('Login error:', err);
+      setError('Login failed. Please try again. | فشل تسجيل الدخول. حاول مرة أخرى.');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  return (
+    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-amber-900/30 flex items-center justify-center p-4">
+      <div className="w-full max-w-md">
+        {/* University Header */}
+        <div className="text-center mb-8">
+          <div className="w-20 h-20 bg-amber-600 rounded-2xl flex items-center justify-center mx-auto mb-4">
+            <span className="text-white font-black text-2xl">TU</span>
+          </div>
+          <h1 className="text-2xl font-bold text-white">Taif University</h1>
+          <p className="text-amber-300 font-arabic">جامعة الطائف</p>
+          <p className="text-slate-400 text-sm mt-2">College of Computers & Information Technology</p>
+        </div>
+
+        {/* Login Card */}
+        <div className="bg-slate-800/80 backdrop-blur rounded-2xl p-8 border border-slate-700">
+          <div className="text-center mb-6">
+            <h2 className="text-xl font-bold text-white">Student Login</h2>
+            <p className="text-amber-300/70 font-arabic">تسجيل دخول الطالب</p>
+          </div>
+
+          <div className="bg-slate-700/50 rounded-xl p-4 mb-6">
+            <p className="text-amber-400 font-semibold text-sm">0502241-3</p>
+            <p className="text-white">Introduction to Database</p>
+            <p className="text-slate-400 font-arabic text-sm">مقدمة في قواعد البيانات</p>
+          </div>
+
+          <form onSubmit={handleSubmit} className="space-y-4">
+            <div>
+              <label className="block text-slate-400 text-sm mb-1">
+                Student Number | الرقم الجامعي
+              </label>
+              <input
+                type="text"
+                value={studentNumber}
+                onChange={(e) => {
+                  setStudentNumber(e.target.value);
+                  setError('');
+                }}
+                placeholder="e.g., 44012345"
+                className="w-full px-4 py-3 bg-slate-700 border border-slate-600 rounded-xl text-white placeholder-slate-500 focus:outline-none focus:border-amber-500 transition-colors"
+                required
+              />
+            </div>
+
+            <div>
+              <label className="block text-slate-400 text-sm mb-1">
+                Password | كلمة المرور
+              </label>
+              <input
+                type="password"
+                value={password}
+                onChange={(e) => {
+                  setPassword(e.target.value);
+                  setError('');
+                }}
+                placeholder="Enter your password"
+                className="w-full px-4 py-3 bg-slate-700 border border-slate-600 rounded-xl text-white placeholder-slate-500 focus:outline-none focus:border-amber-500 transition-colors"
+                required
+              />
+            </div>
+
+            {error && (
+              <div className="bg-red-900/30 border border-red-500/50 rounded-xl p-3">
+                <p className="text-red-400 text-sm">{error}</p>
+              </div>
+            )}
+
+            <button
+              type="submit"
+              disabled={loading}
+              className="w-full py-3 bg-gradient-to-r from-amber-600 to-amber-500 hover:from-amber-500 hover:to-amber-400 text-white font-bold rounded-xl transition-all disabled:opacity-50"
+            >
+              {loading ? 'Logging in... | جاري الدخول...' : 'Login | تسجيل الدخول'}
+            </button>
+          </form>
+
+          <div className="mt-6 text-center">
+            <p className="text-slate-400 text-sm">
+              Don't have an account? | ليس لديك حساب؟
+            </p>
+            <button
+              onClick={() => onNavigate('register')}
+              className="text-amber-400 hover:text-amber-300 font-semibold mt-1"
+            >
+              Register Now | سجّل الآن
+            </button>
+          </div>
+        </div>
+
+        <p className="text-center text-slate-500 text-xs mt-6">
+          Prepared By: Sami Alsuwat | إعداد: سامي السواط
+        </p>
+      </div>
     </div>
+  );
+};
 
-    <div class="course-badge">
-      <div class="cb-icon">🗄️</div>
-      <div>
-        <div class="cb-code">0502241-3 &nbsp;|&nbsp; CSC 101</div>
-        <div class="cb-name">Introduction to Database</div>
-        <div class="cb-ar"> اساسيات قواعد البيانات</div>
+
+    // ---- RegisterPage ----
+
+const RegisterPage = ({ onRegister, onNavigate }) => {
+  const [form, setForm] = useState({ studentName: '', studentNumber: '', sectionNumber: '1512', password: '', confirmPassword: '' });
+  const [error, setError] = useState('');
+  const [success, setSuccess] = useState('');
+  const [loading, setLoading] = useState(false);
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    setError('');
+    setSuccess('');
+    
+    if (form.password !== form.confirmPassword) {
+      setError('Passwords do not match | كلمات المرور غير متطابقة');
+      return;
+    }
+    if (form.studentNumber.length !== 8) {
+      setError('Student number must be 8 digits | الرقم الجامعي يجب أن يكون 8 أرقام');
+      return;
+    }
+    if (form.password.length < 4) {
+      setError('Password must be at least 4 characters | كلمة المرور يجب أن تكون 4 أحرف على الأقل');
+      return;
+    }
+
+    setLoading(true);
+    try {
+      const result = await onRegister(form);
+      if (result === true) {
+        setSuccess('Registration successful! Redirecting... | تم التسجيل بنجاح! جاري التحويل...');
+      } else {
+        setError('Student number already exists | الرقم الجامعي مسجل مسبقاً');
+      }
+    } catch (err) {
+      setError('Registration failed. Please try again. | فشل التسجيل. حاول مرة أخرى.');
+    }
+    setLoading(false);
+  };
+
+  return (
+    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-amber-900/20 to-slate-900 flex items-center justify-center p-4">
+      <div className="bg-slate-800/50 backdrop-blur rounded-2xl p-8 w-full max-w-md border border-slate-700">
+        <div className="text-center mb-8">
+          <div className="w-16 h-16 bg-amber-600 rounded-xl flex items-center justify-center mx-auto mb-4">
+            <span className="text-white font-black text-xl">DB</span>
+          </div>
+          <h1 className="text-2xl font-bold text-white">Register</h1>
+          <p className="text-amber-300/70 font-arabic">تسجيل حساب جديد</p>
+        </div>
+
+        <form onSubmit={handleSubmit} className="space-y-4">
+          {error && (
+            <div className="bg-red-500/20 border border-red-500/50 rounded-lg p-3 text-red-300 text-sm flex items-center gap-2">
+              <span>❌</span> {error}
+            </div>
+          )}
+          {success && (
+            <div className="bg-emerald-500/20 border border-emerald-500/50 rounded-lg p-3 text-emerald-300 text-sm flex items-center gap-2">
+              <span>✅</span> {success}
+            </div>
+          )}
+          
+          <div>
+            <label className="block text-slate-300 text-sm mb-2">Full Name | الاسم الكامل</label>
+            <input type="text" value={form.studentName} onChange={(e) => setForm({...form, studentName: e.target.value})} className="w-full px-4 py-3 bg-slate-700/50 border border-slate-600 rounded-lg text-white focus:outline-none focus:border-amber-500" required disabled={loading} />
+          </div>
+
+          <div>
+            <label className="block text-slate-300 text-sm mb-2">Student Number (8 digits) | الرقم الجامعي</label>
+            <input type="text" value={form.studentNumber} onChange={(e) => setForm({...form, studentNumber: e.target.value.replace(/\D/g, '').slice(0, 8)})} className="w-full px-4 py-3 bg-slate-700/50 border border-slate-600 rounded-lg text-white focus:outline-none focus:border-amber-500" required disabled={loading} />
+          </div>
+
+          <div>
+            <label className="block text-slate-300 text-sm mb-2">Section | الشعبة</label>
+            <select value={form.sectionNumber} onChange={(e) => setForm({...form, sectionNumber: e.target.value})} className="w-full px-4 py-3 bg-slate-700/50 border border-slate-600 rounded-lg text-white focus:outline-none focus:border-amber-500" disabled={loading}>
+              <option value="1512">1512</option>
+              <option value="1515">1515</option>
+              <option value="572">572</option>
+              <option value="629">629</option>
+              <option value="650">650</option>
+              <option value="651">651</option>
+            </select>
+          </div>
+
+          <div>
+            <label className="block text-slate-300 text-sm mb-2">Password | كلمة المرور</label>
+            <input type="password" value={form.password} onChange={(e) => setForm({...form, password: e.target.value})} className="w-full px-4 py-3 bg-slate-700/50 border border-slate-600 rounded-lg text-white focus:outline-none focus:border-amber-500" required disabled={loading} />
+          </div>
+
+          <div>
+            <label className="block text-slate-300 text-sm mb-2">Confirm Password | تأكيد كلمة المرور</label>
+            <input type="password" value={form.confirmPassword} onChange={(e) => setForm({...form, confirmPassword: e.target.value})} className="w-full px-4 py-3 bg-slate-700/50 border border-slate-600 rounded-lg text-white focus:outline-none focus:border-amber-500" required disabled={loading} />
+          </div>
+
+          <button type="submit" disabled={loading} className="w-full py-3 bg-amber-600 hover:bg-amber-500 text-white font-bold rounded-lg disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2">
+            {loading ? (
+              <>
+                <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+                Registering...
+              </>
+            ) : (
+              'Register | تسجيل'
+            )}
+          </button>
+        </form>
+
+        <p className="text-center text-slate-400 mt-6">
+          Already have an account? <button onClick={() => onNavigate('login')} className="text-amber-400 hover:underline">Login</button>
+        </p>
       </div>
     </div>
+  );
+};
 
-    <div class="landing-btns">
-      <button class="btn-signin" onclick="show('loginView')">🔐 &nbsp; Sign In &nbsp;|&nbsp; تسجيل الدخول</button>
-      <button class="btn-register" onclick="show('registerView')">📝 &nbsp; Register &nbsp;|&nbsp; إنشاء حساب</button>
+
+    // ---- HomePage ----
+
+const HomePage = ({ user, onNavigate, onLogout }) => {
+  const weeks = [
+    { week: 1, titleEn: "Introduction to Databases", titleAr: "مقدمة في قواعد البيانات", icon: "🗄️" },
+    { week: 2, titleEn: "Creating a Database", titleAr: "إنشاء قاعدة بيانات", icon: "📁" },
+    { week: 3, titleEn: "Creating Tables (Part 1)", titleAr: "إنشاء الجداول (1)", icon: "📋" },
+    { week: 4, titleEn: "Creating Tables (Part 2)", titleAr: "إنشاء الجداول (2)", icon: "🔗" },
+    { week: 5, titleEn: "Creating Tables (Part 3)", titleAr: "إنشاء الجداول (3)", icon: "📊" },
+    { week: 6, titleEn: "Inserting Data (Part 1)", titleAr: "إدراج البيانات (1)", icon: "✏️" },
+    { week: 7, titleEn: "Inserting Data (Part 2)", titleAr: "إدراج البيانات (2)", icon: "📝" },
+    { week: 8, titleEn: "Query Basics (Part 1)", titleAr: "أساسيات الاستعلام (1)", icon: "🔍" },
+    { week: 9, titleEn: "Query Basics (Part 2)", titleAr: "أساسيات الاستعلام (2)", icon: "🔗" },
+    { week: 10, titleEn: "Advanced Queries (Part 1)", titleAr: "الاستعلامات المتقدمة (1)", icon: "🧩" },
+    { week: 11, titleEn: "Advanced Queries (Part 2)", titleAr: "الاستعلامات المتقدمة (2)", icon: "🔄" },
+    { week: 12, titleEn: "Database Design & Normalization", titleAr: "تصميم قواعد البيانات والتطبيع", icon: "🏗️" },
+  ];
+
+  const completedWeeks = Object.entries(user.progress)
+    .filter(([key, val]) => val.completed && parseInt(key.replace('week', '')) <= 12)
+    .length;
+  const progressPercent = Math.round((completedWeeks / 12) * 100);
+
+  const getGradeColor = (grade) => {
+    if (grade === 'A+' || grade === 'A') return 'text-emerald-400';
+    if (grade === 'B+' || grade === 'B') return 'text-blue-400';
+    if (grade === 'C+' || grade === 'C') return 'text-yellow-400';
+    if (grade === 'D+' || grade === 'D') return 'text-orange-400';
+    if (grade === 'F') return 'text-red-400';
+    return 'text-slate-400';
+  };
+
+  return (
+    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-amber-900/30">
+      <header className="bg-slate-800/80 backdrop-blur border-b border-slate-700 sticky top-0 z-50">
+        <div className="max-w-7xl mx-auto px-4 py-3">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-3">
+              <div className="w-10 h-10 bg-amber-600 rounded-lg flex items-center justify-center">
+                <span className="text-white font-black">TU</span>
+              </div>
+              <div>
+                <h1 className="text-white font-bold">Introduction to Database</h1>
+                <p className="text-amber-300/70 text-xs font-arabic">مقدمة في قواعد البيانات</p>
+              </div>
+            </div>
+            <div className="flex items-center gap-4">
+              <button onClick={() => onNavigate('profile')} className="flex items-center gap-2 px-3 py-2 bg-slate-700 hover:bg-slate-600 rounded-lg transition-colors">
+                <div className="w-8 h-8 bg-amber-600 rounded-full flex items-center justify-center text-white font-bold text-sm">{user.studentName.charAt(0)}</div>
+                <div className="text-left hidden sm:block">
+                  <p className="text-white text-sm font-semibold">{user.studentName}</p>
+                  <p className="text-slate-400 text-xs">{user.studentNumber}</p>
+                </div>
+              </button>
+              <button onClick={onLogout} className="px-4 py-2 bg-red-600/20 hover:bg-red-600/30 text-red-400 rounded-lg text-sm">Logout</button>
+            </div>
+          </div>
+        </div>
+      </header>
+
+      <div className="max-w-7xl mx-auto px-4 py-8">
+        {/* Telegram Banner */}
+        <a href="https://t.me/+B2zs30x2p9dhNzRk" target="_blank" rel="noopener noreferrer" className="block mb-8 bg-gradient-to-r from-blue-600 to-blue-500 rounded-2xl p-4 hover:from-blue-500 hover:to-blue-400 transition-all">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-4">
+              <div className="w-12 h-12 bg-white/20 rounded-xl flex items-center justify-center">
+                <svg className="w-7 h-7 text-white" viewBox="0 0 24 24" fill="currentColor">
+                  <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm4.64 6.8c-.15 1.58-.8 5.42-1.13 7.19-.14.75-.42 1-.68 1.03-.58.05-1.02-.38-1.58-.75-.88-.58-1.38-.94-2.23-1.5-.99-.65-.35-1.01.22-1.59.15-.15 2.71-2.48 2.76-2.69a.2.2 0 00-.05-.18c-.06-.05-.14-.03-.21-.02-.09.02-1.49.95-4.22 2.79-.4.27-.76.41-1.08.4-.36-.01-1.04-.2-1.55-.37-.63-.2-1.12-.31-1.08-.66.02-.18.27-.36.74-.55 2.92-1.27 4.86-2.11 5.83-2.51 2.78-1.16 3.35-1.36 3.73-1.36.08 0 .27.02.39.12.1.08.13.19.14.27-.01.06.01.24 0 .38z"/>
+                </svg>
+              </div>
+              <div>
+                <h3 className="text-white font-bold text-lg">Join Our Telegram Channel!</h3>
+                <p className="text-white/80 text-sm">انضم لقناة التليجرام للدعم والتحديثات</p>
+              </div>
+            </div>
+            <div className="text-white text-2xl">→</div>
+          </div>
+        </a>
+
+        {/* Dashboard Cards */}
+        <div className="grid md:grid-cols-3 gap-6 mb-8">
+          <div className="bg-slate-800/50 rounded-2xl p-6 border border-slate-700">
+            <h3 className="text-slate-400 text-sm mb-2">Overall Progress | التقدم العام</h3>
+            <div className="flex items-end gap-3">
+              <span className="text-4xl font-bold text-white">{progressPercent}%</span>
+              <span className="text-slate-400 text-sm mb-1">{completedWeeks}/12 weeks</span>
+            </div>
+            <div className="mt-4 h-3 bg-slate-700 rounded-full overflow-hidden">
+              <div className="h-full bg-gradient-to-r from-amber-500 to-amber-400 transition-all" style={{ width: `${progressPercent}%` }} />
+            </div>
+          </div>
+          <div className="bg-slate-800/50 rounded-2xl p-6 border border-slate-700">
+            <h3 className="text-slate-400 text-sm mb-2">Current Grade | الدرجة الحالية</h3>
+            <div className="flex items-end gap-3">
+              <span className={`text-4xl font-bold ${getGradeColor(user.overallGrade)}`}>{user.overallGrade}</span>
+              <span className="text-slate-400 text-sm mb-1">{user.totalScore}% avg</span>
+            </div>
+            <p className="text-slate-500 text-xs mt-3">Based on completed exercises</p>
+          </div>
+          <div className="bg-slate-800/50 rounded-2xl p-6 border border-slate-700">
+            <h3 className="text-slate-400 text-sm mb-2">Student Info | معلومات الطالب</h3>
+            <div className="space-y-2">
+              <div className="flex justify-between"><span className="text-slate-500 text-sm">Name:</span><span className="text-white text-sm">{user.studentName}</span></div>
+              <div className="flex justify-between"><span className="text-slate-500 text-sm">ID:</span><span className="text-white text-sm font-mono">{user.studentNumber}</span></div>
+              <div className="flex justify-between"><span className="text-slate-500 text-sm">Section:</span><span className="text-amber-400 text-sm">{user.sectionNumber}</span></div>
+            </div>
+          </div>
+        </div>
+
+        {/* Course Weeks */}
+        <div className="mb-6">
+          <h2 className="text-2xl font-bold text-white mb-1">Course Weeks</h2>
+          <p className="text-amber-300/70 font-arabic">أسابيع الدورة</p>
+        </div>
+
+        <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
+          {weeks.map((week) => {
+            const weekProgress = user.progress[`week${week.week}`];
+            const isCompleted = weekProgress?.completed;
+            const score = weekProgress?.score || 0;
+            return (
+              <div key={week.week} onClick={() => onNavigate(`week${week.week}`)} className={`relative p-5 rounded-xl border-2 cursor-pointer transition-all hover:scale-[1.02] ${isCompleted ? 'bg-emerald-900/20 border-emerald-500/50' : 'bg-slate-700/30 border-slate-600 hover:border-amber-500/50'}`}>
+                <div className="flex items-start gap-3">
+                  <div className={`w-12 h-12 rounded-xl flex items-center justify-center text-xl ${isCompleted ? 'bg-emerald-600' : 'bg-amber-600'}`}>{isCompleted ? '✓' : week.icon}</div>
+                  <div className="flex-1">
+                    <span className="text-xs text-amber-400 font-semibold">Week {week.week} | الأسبوع {week.week}</span>
+                    <h4 className="text-white font-semibold text-sm">{week.titleEn}</h4>
+                    <p className="text-amber-300/60 text-xs font-arabic">{week.titleAr}</p>
+                  </div>
+                </div>
+                {isCompleted ? (
+                  <div className="mt-3 flex items-center justify-between bg-slate-800/50 rounded-lg p-2">
+                    <span className="text-emerald-400 text-xs">Completed</span>
+                    <span className={`font-bold text-sm ${score >= 90 ? 'text-emerald-400' : score >= 75 ? 'text-blue-400' : score >= 60 ? 'text-yellow-400' : 'text-red-400'}`}>{score}%</span>
+                  </div>
+                ) : (
+                  <div className="mt-3 text-center"><span className="text-slate-400 text-xs">Click to start →</span></div>
+                )}
+              </div>
+            );
+          })}
+        </div>
+
+        {/* Contact Section */}
+        <div className="mt-12 bg-slate-800/50 rounded-2xl p-8 border border-slate-700">
+          <div className="text-center mb-6">
+            <h2 className="text-2xl font-bold text-white mb-2">Contact & Support</h2>
+            <p className="text-amber-300/70 font-arabic">التواصل والدعم</p>
+          </div>
+          <div className="flex flex-col md:flex-row items-center justify-center gap-6">
+            <a href="https://t.me/+B2zs30x2p9dhNzRk" target="_blank" rel="noopener noreferrer" className="flex items-center gap-3 px-6 py-4 bg-blue-600 hover:bg-blue-500 rounded-xl transition-colors">
+              <svg className="w-8 h-8 text-white" viewBox="0 0 24 24" fill="currentColor">
+                <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm4.64 6.8c-.15 1.58-.8 5.42-1.13 7.19-.14.75-.42 1-.68 1.03-.58.05-1.02-.38-1.58-.75-.88-.58-1.38-.94-2.23-1.5-.99-.65-.35-1.01.22-1.59.15-.15 2.71-2.48 2.76-2.69a.2.2 0 00-.05-.18c-.06-.05-.14-.03-.21-.02-.09.02-1.49.95-4.22 2.79-.4.27-.76.41-1.08.4-.36-.01-1.04-.2-1.55-.37-.63-.2-1.12-.31-1.08-.66.02-.18.27-.36.74-.55 2.92-1.27 4.86-2.11 5.83-2.51 2.78-1.16 3.35-1.36 3.73-1.36.08 0 .27.02.39.12.1.08.13.19.14.27-.01.06.01.24 0 .38z"/>
+              </svg>
+              <div className="text-left">
+                <p className="text-white font-bold">Telegram Channel</p>
+                <p className="text-white/70 text-sm">قناة التليجرام</p>
+              </div>
+            </a>
+            <div className="text-center md:text-left">
+              <p className="text-slate-400">Prepared by | إعداد</p>
+              <p className="text-white font-semibold text-lg">Saad Alamri</p>
+              <p className="text-amber-300/70 font-arabic">سعد العمري</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <footer className="py-6 text-center border-t border-slate-800 mt-8">
+        <p className="text-slate-500 text-sm">Introduction to Database | Taif University | جامعة الطائف</p>
+        <p className="text-slate-600 text-xs mt-2">College of Computers & Information Technology</p>
+      </footer>
     </div>
+  );
+};
 
-    <div class="footer-txt">Prepared by <span>Sami Alsuwat</span> &nbsp;·&nbsp; سامي السواط</div>
-  </div>
 
-  <div id="loginView" class="view">
-    <div class="card">
-      <div class="card-hdr">
-        <button class="back" onclick="show('landingView')">← Back</button>
-        <div class="card-icon">🔐</div>
-        <h2>Student Login</h2>
-        <div class="sub">تسجيل دخول الطالب</div>
-      </div>
-      <div id="loginAlert"></div>
-      <div class="field">
-        <label>Student Number | الرقم الجامعي</label>
-        <input id="loginNum" type="text" placeholder="e.g. 44012345" maxlength="8">
-      </div>
-      <div class="field">
-        <label>Password | كلمة المرور</label>
-        <input id="loginPass" type="password" placeholder="Enter your password">
-      </div>
-      <button class="submit-btn" id="loginBtn" onclick="doLogin()">Sign In | تسجيل الدخول</button>
-      <div class="switch-txt">
-        Don't have an account? <button onclick="show('registerView')">Register Now | سجّل الآن</button>
+    // ---- ProfilePage ----
+
+const ProfilePage = ({ user, onNavigate, onLogout }) => {
+  const weeks = [
+    { week: 1, titleEn: "Introduction to Databases" },
+    { week: 2, titleEn: "Creating a Database" },
+    { week: 3, titleEn: "Creating Tables (Part 1)" },
+    { week: 4, titleEn: "Creating Tables (Part 2)" },
+    { week: 5, titleEn: "Creating Tables (Part 3)" },
+    { week: 6, titleEn: "Inserting Data (Part 1)" },
+    { week: 7, titleEn: "Inserting Data (Part 2)" },
+    { week: 8, titleEn: "Query Basics (Part 1)" },
+    { week: 9, titleEn: "Query Basics (Part 2)" },
+    { week: 10, titleEn: "Advanced Queries (Part 1)" },
+    { week: 11, titleEn: "Advanced Queries (Part 2)" },
+    { week: 12, titleEn: "Database Design & Normalization" },
+  ];
+
+  const getGradeColor = (score) => {
+    if (score >= 90) return 'text-emerald-400 bg-emerald-900/30';
+    if (score >= 75) return 'text-blue-400 bg-blue-900/30';
+    if (score >= 60) return 'text-yellow-400 bg-yellow-900/30';
+    if (score >= 50) return 'text-orange-400 bg-orange-900/30';
+    return 'text-red-400 bg-red-900/30';
+  };
+
+  const getLetterGrade = (score) => {
+    if (score >= 90) return 'A+';
+    if (score >= 85) return 'A';
+    if (score >= 80) return 'B+';
+    if (score >= 75) return 'B';
+    if (score >= 70) return 'C+';
+    if (score >= 65) return 'C';
+    if (score >= 60) return 'D+';
+    if (score >= 50) return 'D';
+    return 'F';
+  };
+
+  const completedWeeks = Object.values(user.progress).filter(w => w.completed);
+  const totalAttempts = completedWeeks.reduce((sum, w) => sum + w.attempts, 0);
+
+  return (
+    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-amber-900/30">
+      {/* Header */}
+      <header className="bg-slate-800/80 backdrop-blur border-b border-slate-700">
+        <div className="max-w-4xl mx-auto px-4 py-4">
+          <div className="flex items-center justify-between">
+            <button
+              onClick={() => onNavigate('home')}
+              className="px-4 py-2 bg-slate-700 hover:bg-slate-600 rounded-lg text-white text-sm"
+            >
+              ← Back to Course
+            </button>
+            <button
+              onClick={onLogout}
+              className="px-4 py-2 bg-red-600/20 hover:bg-red-600/30 text-red-400 rounded-lg text-sm"
+            >
+              Logout
+            </button>
+          </div>
+        </div>
+      </header>
+
+      <div className="max-w-4xl mx-auto px-4 py-8">
+        {/* Profile Header */}
+        <div className="bg-slate-800/50 rounded-2xl p-8 border border-slate-700 mb-8">
+          <div className="flex flex-col md:flex-row items-center gap-6">
+            <div className="w-24 h-24 bg-gradient-to-br from-amber-500 to-amber-600 rounded-full flex items-center justify-center text-white text-4xl font-bold">
+              {user.studentName.charAt(0)}
+            </div>
+            <div className="text-center md:text-left flex-1">
+              <h1 className="text-3xl font-bold text-white">{user.studentName}</h1>
+              <p className="text-amber-300 font-mono text-lg">{user.studentNumber}</p>
+              <p className="text-slate-400">Section {user.sectionNumber} | الشعبة {user.sectionNumber}</p>
+            </div>
+            <div className="text-center">
+              <div className={`text-5xl font-black ${user.overallGrade === 'N/A' ? 'text-slate-500' : 
+                user.totalScore >= 90 ? 'text-emerald-400' :
+                user.totalScore >= 75 ? 'text-blue-400' :
+                user.totalScore >= 60 ? 'text-yellow-400' : 'text-red-400'
+              }`}>
+                {user.overallGrade}
+              </div>
+              <p className="text-slate-400 text-sm">Overall Grade</p>
+              <p className="text-white font-semibold">{user.totalScore}%</p>
+            </div>
+          </div>
+        </div>
+
+        {/* Stats Grid */}
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
+          <div className="bg-slate-800/50 rounded-xl p-4 border border-slate-700 text-center">
+            <span className="text-3xl font-bold text-white">{completedWeeks.length}</span>
+            <p className="text-slate-400 text-sm">Weeks Completed</p>
+          </div>
+          <div className="bg-slate-800/50 rounded-xl p-4 border border-slate-700 text-center">
+            <span className="text-3xl font-bold text-amber-400">{13 - completedWeeks.length}</span>
+            <p className="text-slate-400 text-sm">Weeks Remaining</p>
+          </div>
+          <div className="bg-slate-800/50 rounded-xl p-4 border border-slate-700 text-center">
+            <span className="text-3xl font-bold text-white">{totalAttempts}</span>
+            <p className="text-slate-400 text-sm">Total Attempts</p>
+          </div>
+          <div className="bg-slate-800/50 rounded-xl p-4 border border-slate-700 text-center">
+            <span className="text-3xl font-bold text-emerald-400">
+              {Math.round((completedWeeks.length / 13) * 100)}%
+            </span>
+            <p className="text-slate-400 text-sm">Progress</p>
+          </div>
+        </div>
+
+        {/* Grade Report */}
+        <div className="bg-slate-800/50 rounded-2xl border border-slate-700 overflow-hidden">
+          <div className="bg-slate-700/50 px-6 py-4">
+            <h2 className="text-xl font-bold text-white">Grade Report | تقرير الدرجات</h2>
+          </div>
+          
+          <div className="overflow-x-auto">
+            <table className="w-full">
+              <thead className="bg-slate-700/30">
+                <tr>
+                  <th className="px-6 py-3 text-left text-xs font-semibold text-slate-400 uppercase">Week</th>
+                  <th className="px-6 py-3 text-left text-xs font-semibold text-slate-400 uppercase">Topic</th>
+                  <th className="px-6 py-3 text-center text-xs font-semibold text-slate-400 uppercase">Status</th>
+                  <th className="px-6 py-3 text-center text-xs font-semibold text-slate-400 uppercase">Score</th>
+                  <th className="px-6 py-3 text-center text-xs font-semibold text-slate-400 uppercase">Grade</th>
+                  <th className="px-6 py-3 text-center text-xs font-semibold text-slate-400 uppercase">Attempts</th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-slate-700">
+                {weeks.map((week) => {
+                  const progress = user.progress[`week${week.week}`];
+                  const isCompleted = progress?.completed;
+                  const score = progress?.score || 0;
+
+                  return (
+                    <tr key={week.week} className="hover:bg-slate-700/20">
+                      <td className="px-6 py-4 text-white font-semibold">
+                        Week {week.week}
+                      </td>
+                      <td className="px-6 py-4 text-slate-300 text-sm">
+                        {week.titleEn}
+                      </td>
+                      <td className="px-6 py-4 text-center">
+                        {isCompleted ? (
+                          <span className="px-2 py-1 bg-emerald-900/30 text-emerald-400 rounded-full text-xs">
+                            ✓ Completed
+                          </span>
+                        ) : (
+                          <span className="px-2 py-1 bg-slate-700 text-slate-400 rounded-full text-xs">
+                            Pending
+                          </span>
+                        )}
+                      </td>
+                      <td className="px-6 py-4 text-center">
+                        {isCompleted ? (
+                          <span className={`font-bold ${getGradeColor(score).split(' ')[0]}`}>
+                            {score}%
+                          </span>
+                        ) : (
+                          <span className="text-slate-500">-</span>
+                        )}
+                      </td>
+                      <td className="px-6 py-4 text-center">
+                        {isCompleted ? (
+                          <span className={`px-2 py-1 rounded text-xs font-bold ${getGradeColor(score)}`}>
+                            {getLetterGrade(score)}
+                          </span>
+                        ) : (
+                          <span className="text-slate-500">-</span>
+                        )}
+                      </td>
+                      <td className="px-6 py-4 text-center text-slate-400">
+                        {progress?.attempts || 0}
+                      </td>
+                    </tr>
+                  );
+                })}
+              </tbody>
+            </table>
+          </div>
+
+          {/* Summary Footer */}
+          <div className="bg-slate-700/30 px-6 py-4 flex justify-between items-center">
+            <div>
+              <span className="text-slate-400 text-sm">Total Average:</span>
+              <span className="text-white font-bold ml-2">{user.totalScore}%</span>
+            </div>
+            <div>
+              <span className="text-slate-400 text-sm">Final Grade:</span>
+              <span className={`font-bold ml-2 text-lg ${
+                user.totalScore >= 90 ? 'text-emerald-400' :
+                user.totalScore >= 75 ? 'text-blue-400' :
+                user.totalScore >= 60 ? 'text-yellow-400' : 'text-slate-400'
+              }`}>
+                {user.overallGrade}
+              </span>
+            </div>
+          </div>
+        </div>
+
+        {/* Grading Scale */}
+        <div className="mt-8 bg-slate-800/50 rounded-xl p-6 border border-slate-700">
+          <h3 className="text-white font-semibold mb-4">Grading Scale | مقياس الدرجات</h3>
+          <div className="grid grid-cols-5 md:grid-cols-10 gap-2 text-center text-xs">
+            {[
+              { grade: 'A+', min: 90, color: 'bg-emerald-600' },
+              { grade: 'A', min: 85, color: 'bg-emerald-500' },
+              { grade: 'B+', min: 80, color: 'bg-blue-600' },
+              { grade: 'B', min: 75, color: 'bg-blue-500' },
+              { grade: 'C+', min: 70, color: 'bg-yellow-600' },
+              { grade: 'C', min: 65, color: 'bg-yellow-500' },
+              { grade: 'D+', min: 60, color: 'bg-orange-600' },
+              { grade: 'D', min: 50, color: 'bg-orange-500' },
+              { grade: 'F', min: 0, color: 'bg-red-600' },
+            ].map((g) => (
+              <div key={g.grade} className={`${g.color} rounded p-2`}>
+                <div className="font-bold text-white">{g.grade}</div>
+                <div className="text-white/70">{g.min}%+</div>
+              </div>
+            ))}
+          </div>
+        </div>
       </div>
     </div>
-  </div>
+  );
+};
 
-  <div id="registerView" class="view">
-    <div class="card">
-      <div class="card-hdr">
-        <button class="back" onclick="show('landingView')">← Back</button>
-        <div class="card-icon">📝</div>
-        <h2>Create Account</h2>
-        <div class="sub">إنشاء حساب جديد</div>
+
+    // ---- AdminDashboard ----
+
+const AdminDashboard = ({ students, onNavigate, onLogout, onRefresh }) => {
+  const [searchTerm, setSearchTerm] = useState('');
+  const [sortBy, setSortBy] = useState('name');
+  const [filterSection, setFilterSection] = useState('all');
+  const [selectedStudent, setSelectedStudent] = useState(null);
+  const [refreshing, setRefreshing] = useState(false);
+
+  const weeks = [
+    { week: 1, titleEn: "Introduction to Databases" },
+    { week: 2, titleEn: "Creating a Database" },
+    { week: 3, titleEn: "Creating Tables (Part 1)" },
+    { week: 4, titleEn: "Creating Tables (Part 2)" },
+    { week: 5, titleEn: "Creating Tables (Part 3)" },
+    { week: 6, titleEn: "Inserting Data (Part 1)" },
+    { week: 7, titleEn: "Inserting Data (Part 2)" },
+    { week: 8, titleEn: "Query Basics (Part 1)" },
+    { week: 9, titleEn: "Query Basics (Part 2)" },
+    { week: 10, titleEn: "Advanced Queries (Part 1)" },
+    { week: 11, titleEn: "Advanced Queries (Part 2)" },
+    { week: 12, titleEn: "Database Design & Normalization" },
+  ];
+
+  // Get unique sections
+  const sections = useMemo(() => {
+    if (!students || students.length === 0) return ['all'];
+    const sectionSet = new Set(students.map(s => s.sectionNumber));
+    return ['all', ...Array.from(sectionSet).sort()];
+  }, [students]);
+
+  // Filter and sort students
+  const filteredStudents = useMemo(() => {
+    if (!students || students.length === 0) return [];
+    let result = [...students];
+
+    // Filter by search
+    if (searchTerm) {
+      const term = searchTerm.toLowerCase();
+      result = result.filter(s => 
+        s.studentName?.toLowerCase().includes(term) ||
+        s.studentNumber?.toLowerCase().includes(term)
+      );
+    }
+
+    // Filter by section
+    if (filterSection !== 'all') {
+      result = result.filter(s => s.sectionNumber === filterSection);
+    }
+
+    // Sort
+    result.sort((a, b) => {
+      switch (sortBy) {
+        case 'name':
+          return (a.studentName || '').localeCompare(b.studentName || '');
+        case 'id':
+          return (a.studentNumber || '').localeCompare(b.studentNumber || '');
+        case 'grade':
+          return (b.totalScore || 0) - (a.totalScore || 0);
+        case 'progress':
+          const aProgress = a.progress ? Object.values(a.progress).filter(w => w.completed).length : 0;
+          const bProgress = b.progress ? Object.values(b.progress).filter(w => w.completed).length : 0;
+          return bProgress - aProgress;
+        default:
+          return 0;
+      }
+    });
+
+    return result;
+  }, [students, searchTerm, sortBy, filterSection]);
+
+  // Calculate statistics
+  const stats = useMemo(() => {
+    if (!students || students.length === 0) return { total: 0, avgScore: 0, avgProgress: 0, gradeDistribution: {} };
+
+    const totalScore = students.reduce((sum, s) => sum + (s.totalScore || 0), 0);
+    const totalProgress = students.reduce((sum, s) => {
+      const completed = s.progress ? Object.values(s.progress).filter(w => w.completed).length : 0;
+      return sum + (completed / 12) * 100;
+    }, 0);
+
+    const gradeDistribution = { 'A+': 0, 'A': 0, 'B+': 0, 'B': 0, 'C+': 0, 'C': 0, 'D+': 0, 'D': 0, 'F': 0, 'N/A': 0 };
+    students.forEach(s => {
+      const grade = s.overallGrade || 'N/A';
+      if (gradeDistribution.hasOwnProperty(grade)) {
+        gradeDistribution[grade]++;
+      }
+    });
+
+    return {
+      total: students.length,
+      avgScore: students.length > 0 ? Math.round(totalScore / students.length) : 0,
+      avgProgress: students.length > 0 ? Math.round(totalProgress / students.length) : 0,
+      gradeDistribution
+    };
+  }, [students]);
+
+  const getGradeColor = (grade) => {
+    if (grade === 'A+' || grade === 'A') return 'text-emerald-400';
+    if (grade === 'B+' || grade === 'B') return 'text-blue-400';
+    if (grade === 'C+' || grade === 'C') return 'text-yellow-400';
+    if (grade === 'D+' || grade === 'D') return 'text-orange-400';
+    if (grade === 'F') return 'text-red-400';
+    return 'text-slate-400';
+  };
+
+  const getGradeBg = (grade) => {
+    if (grade === 'A+' || grade === 'A') return 'bg-emerald-500/20 border-emerald-500/50';
+    if (grade === 'B+' || grade === 'B') return 'bg-blue-500/20 border-blue-500/50';
+    if (grade === 'C+' || grade === 'C') return 'bg-yellow-500/20 border-yellow-500/50';
+    if (grade === 'D+' || grade === 'D') return 'bg-orange-500/20 border-orange-500/50';
+    if (grade === 'F') return 'bg-red-500/20 border-red-500/50';
+    return 'bg-slate-500/20 border-slate-500/50';
+  };
+
+  const getScoreColor = (score) => {
+    if (score >= 90) return 'text-emerald-400';
+    if (score >= 75) return 'text-blue-400';
+    if (score >= 60) return 'text-yellow-400';
+    if (score >= 50) return 'text-orange-400';
+    return 'text-red-400';
+  };
+
+  // Refresh data from Supabase
+  const handleRefresh = async () => {
+    setRefreshing(true);
+    if (onRefresh) {
+      await onRefresh();
+    }
+    setRefreshing(false);
+  };
+
+  const StudentDetailModal = ({ student, onClose }) => {
+    const completedWeeks = student.progress 
+      ? Object.entries(student.progress)
+          .filter(([key, val]) => val.completed && parseInt(key.replace('week', '')) <= 12)
+          .length
+      : 0;
+    const progressPercent = Math.round((completedWeeks / 12) * 100);
+
+    return (
+      <div className="fixed inset-0 bg-black/70 backdrop-blur-sm z-50 flex items-center justify-center p-4" onClick={onClose}>
+        <div className="bg-slate-800 rounded-2xl border border-slate-700 max-w-3xl w-full max-h-[90vh] overflow-y-auto" onClick={e => e.stopPropagation()}>
+          {/* Header */}
+          <div className="p-6 border-b border-slate-700 flex items-center justify-between">
+            <div className="flex items-center gap-4">
+              <div className="w-14 h-14 bg-amber-600 rounded-xl flex items-center justify-center text-white font-bold text-xl">
+                {student.studentName?.charAt(0) || '?'}
+              </div>
+              <div>
+                <h2 className="text-xl font-bold text-white">{student.studentName}</h2>
+                <p className="text-slate-400 text-sm">ID: {student.studentNumber} | Section: {student.sectionNumber}</p>
+              </div>
+            </div>
+            <button onClick={onClose} className="p-2 hover:bg-slate-700 rounded-lg text-slate-400 hover:text-white transition-colors">
+              <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+              </svg>
+            </button>
+          </div>
+
+          {/* Stats */}
+          <div className="p-6 grid grid-cols-3 gap-4 border-b border-slate-700">
+            <div className="bg-slate-700/50 rounded-xl p-4 text-center">
+              <p className="text-slate-400 text-sm mb-1">Overall Grade</p>
+              <p className={`text-3xl font-bold ${getGradeColor(student.overallGrade)}`}>{student.overallGrade || 'N/A'}</p>
+            </div>
+            <div className="bg-slate-700/50 rounded-xl p-4 text-center">
+              <p className="text-slate-400 text-sm mb-1">Average Score</p>
+              <p className={`text-3xl font-bold ${getScoreColor(student.totalScore || 0)}`}>{student.totalScore || 0}%</p>
+            </div>
+            <div className="bg-slate-700/50 rounded-xl p-4 text-center">
+              <p className="text-slate-400 text-sm mb-1">Progress</p>
+              <p className="text-3xl font-bold text-amber-400">{progressPercent}%</p>
+            </div>
+          </div>
+
+          {/* Week by Week Progress */}
+          <div className="p-6">
+            <h3 className="text-lg font-semibold text-white mb-4">Week-by-Week Progress</h3>
+            <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
+              {weeks.map(week => {
+                const weekProgress = student.progress?.[`week${week.week}`];
+                const isCompleted = weekProgress?.completed;
+                const score = weekProgress?.score || 0;
+                const attempts = weekProgress?.attempts || 0;
+
+                return (
+                  <div key={week.week} className={`p-3 rounded-lg border ${isCompleted ? 'bg-emerald-900/20 border-emerald-500/30' : 'bg-slate-700/30 border-slate-600'}`}>
+                    <div className="flex items-center justify-between mb-1">
+                      <span className="text-amber-400 text-xs font-semibold">Week {week.week}</span>
+                      {isCompleted && <span className={`font-bold text-sm ${getScoreColor(score)}`}>{score}%</span>}
+                    </div>
+                    <p className="text-white text-xs truncate">{week.titleEn}</p>
+                    {isCompleted ? (
+                      <p className="text-emerald-400 text-xs mt-1">✓ Completed ({attempts} attempt{attempts !== 1 ? 's' : ''})</p>
+                    ) : (
+                      <p className="text-slate-500 text-xs mt-1">Not started</p>
+                    )}
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+        </div>
       </div>
-      <div id="regAlert"></div>
-      <div class="field">
-        <label>Full Name | الاسم الكامل</label>
-        <input id="regName" type="text" placeholder="your full name">
+    );
+  };
+
+  return (
+    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-amber-900/30">
+      {/* Header */}
+      <header className="bg-slate-800/80 backdrop-blur border-b border-slate-700 sticky top-0 z-40">
+        <div className="max-w-7xl mx-auto px-4 py-3">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-3">
+              <div className="w-10 h-10 bg-amber-600 rounded-lg flex items-center justify-center">
+                <span className="text-white font-black">TU</span>
+              </div>
+              <div>
+                <h1 className="text-white font-bold">Admin Dashboard</h1>
+                <p className="text-amber-300/70 text-xs font-arabic">لوحة تحكم المدير</p>
+              </div>
+            </div>
+            <div className="flex items-center gap-3">
+              <div className="hidden sm:flex items-center gap-2 px-3 py-1.5 bg-emerald-600/20 rounded-lg border border-emerald-500/30">
+                <div className="w-2 h-2 bg-emerald-500 rounded-full animate-pulse"></div>
+                <span className="text-emerald-400 text-xs">Connected to Supabase</span>
+              </div>
+              <button 
+                onClick={handleRefresh} 
+                disabled={refreshing}
+                className="px-4 py-2 bg-emerald-600/20 hover:bg-emerald-600/30 text-emerald-400 rounded-lg text-sm transition-colors flex items-center gap-2 disabled:opacity-50"
+              >
+                <svg className={`w-4 h-4 ${refreshing ? 'animate-spin' : ''}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+                </svg>
+                {refreshing ? 'Refreshing...' : 'Refresh'}
+              </button>
+              <button onClick={onLogout} className="px-4 py-2 bg-red-600/20 hover:bg-red-600/30 text-red-400 rounded-lg text-sm">
+                Logout
+              </button>
+            </div>
+          </div>
+        </div>
+      </header>
+
+      <div className="max-w-7xl mx-auto px-4 py-8">
+        {/* Stats Cards */}
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
+          <div className="bg-slate-800/50 rounded-2xl p-5 border border-slate-700">
+            <div className="flex items-center gap-3 mb-3">
+              <div className="w-10 h-10 bg-amber-600/20 rounded-lg flex items-center justify-center">
+                <svg className="w-5 h-5 text-amber-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z" />
+                </svg>
+              </div>
+              <span className="text-slate-400 text-sm">Total Students</span>
+            </div>
+            <p className="text-3xl font-bold text-white">{stats.total}</p>
+          </div>
+
+          <div className="bg-slate-800/50 rounded-2xl p-5 border border-slate-700">
+            <div className="flex items-center gap-3 mb-3">
+              <div className="w-10 h-10 bg-emerald-600/20 rounded-lg flex items-center justify-center">
+                <svg className="w-5 h-5 text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                </svg>
+              </div>
+              <span className="text-slate-400 text-sm">Avg Score</span>
+            </div>
+            <p className={`text-3xl font-bold ${getScoreColor(stats.avgScore)}`}>{stats.avgScore}%</p>
+          </div>
+
+          <div className="bg-slate-800/50 rounded-2xl p-5 border border-slate-700">
+            <div className="flex items-center gap-3 mb-3">
+              <div className="w-10 h-10 bg-blue-600/20 rounded-lg flex items-center justify-center">
+                <svg className="w-5 h-5 text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6" />
+                </svg>
+              </div>
+              <span className="text-slate-400 text-sm">Avg Progress</span>
+            </div>
+            <p className="text-3xl font-bold text-blue-400">{stats.avgProgress}%</p>
+          </div>
+
+          <div className="bg-slate-800/50 rounded-2xl p-5 border border-slate-700">
+            <div className="flex items-center gap-3 mb-3">
+              <div className="w-10 h-10 bg-purple-600/20 rounded-lg flex items-center justify-center">
+                <svg className="w-5 h-5 text-purple-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
+                </svg>
+              </div>
+              <span className="text-slate-400 text-sm">Sections</span>
+            </div>
+            <p className="text-3xl font-bold text-purple-400">{Math.max(0, sections.length - 1)}</p>
+          </div>
+        </div>
+
+        {/* Grade Distribution */}
+        <div className="bg-slate-800/50 rounded-2xl p-6 border border-slate-700 mb-8">
+          <h3 className="text-lg font-semibold text-white mb-4">Grade Distribution | توزيع الدرجات</h3>
+          <div className="flex flex-wrap gap-3">
+            {['A+', 'A', 'B+', 'B', 'C+', 'C', 'D+', 'D', 'F'].map(grade => (
+              <div key={grade} className={`px-4 py-2 rounded-lg border ${getGradeBg(grade)} flex items-center gap-2`}>
+                <span className={`font-bold ${getGradeColor(grade)}`}>{grade}</span>
+                <span className="text-slate-400 text-sm">({stats.gradeDistribution[grade] || 0})</span>
+              </div>
+            ))}
+          </div>
+        </div>
+
+        {/* Filters and Search */}
+        <div className="bg-slate-800/50 rounded-2xl p-4 border border-slate-700 mb-6">
+          <div className="flex flex-col md:flex-row gap-4">
+            {/* Search */}
+            <div className="flex-1 relative">
+              <svg className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+              </svg>
+              <input
+                type="text"
+                placeholder="Search by name or ID..."
+                value={searchTerm}
+                onChange={e => setSearchTerm(e.target.value)}
+                className="w-full bg-slate-700/50 border border-slate-600 rounded-lg pl-10 pr-4 py-2.5 text-white placeholder-slate-400 focus:outline-none focus:border-amber-500/50"
+              />
+            </div>
+
+            {/* Section Filter */}
+            <select
+              value={filterSection}
+              onChange={e => setFilterSection(e.target.value)}
+              className="bg-slate-700/50 border border-slate-600 rounded-lg px-4 py-2.5 text-white focus:outline-none focus:border-amber-500/50"
+            >
+              {sections.map(section => (
+                <option key={section} value={section}>
+                  {section === 'all' ? 'All Sections' : `Section ${section}`}
+                </option>
+              ))}
+            </select>
+
+            {/* Sort */}
+            <select
+              value={sortBy}
+              onChange={e => setSortBy(e.target.value)}
+              className="bg-slate-700/50 border border-slate-600 rounded-lg px-4 py-2.5 text-white focus:outline-none focus:border-amber-500/50"
+            >
+              <option value="name">Sort by Name</option>
+              <option value="id">Sort by ID</option>
+              <option value="grade">Sort by Grade</option>
+              <option value="progress">Sort by Progress</option>
+            </select>
+          </div>
+        </div>
+
+        {/* Students Table */}
+        <div className="bg-slate-800/50 rounded-2xl border border-slate-700 overflow-hidden">
+          <div className="p-4 border-b border-slate-700 flex items-center justify-between">
+            <h3 className="text-lg font-semibold text-white">Students | الطلاب</h3>
+            <span className="text-slate-400 text-sm">{filteredStudents.length} student{filteredStudents.length !== 1 ? 's' : ''}</span>
+          </div>
+
+          {filteredStudents.length === 0 ? (
+            <div className="p-12 text-center">
+              <svg className="w-16 h-16 text-slate-600 mx-auto mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z" />
+              </svg>
+              <p className="text-slate-400 text-lg mb-2">No students found</p>
+              <p className="text-slate-500 text-sm mb-4">Students will appear here once they register.</p>
+              <button 
+                onClick={handleRefresh}
+                className="px-4 py-2 bg-amber-600 hover:bg-amber-500 text-white rounded-lg text-sm transition-colors"
+              >
+                Click to Refresh Data
+              </button>
+            </div>
+          ) : (
+            <div className="overflow-x-auto">
+              <table className="w-full">
+                <thead>
+                  <tr className="border-b border-slate-700">
+                    <th className="text-left px-4 py-3 text-sm font-medium text-slate-400">Student</th>
+                    <th className="text-left px-4 py-3 text-sm font-medium text-slate-400">Section</th>
+                    <th className="text-center px-4 py-3 text-sm font-medium text-slate-400">Progress</th>
+                    <th className="text-center px-4 py-3 text-sm font-medium text-slate-400">Score</th>
+                    <th className="text-center px-4 py-3 text-sm font-medium text-slate-400">Grade</th>
+                    <th className="text-right px-4 py-3 text-sm font-medium text-slate-400">Actions</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-slate-700/50">
+                  {filteredStudents.map(student => {
+                    const completedWeeks = student.progress
+                      ? Object.entries(student.progress)
+                          .filter(([key, val]) => val.completed && parseInt(key.replace('week', '')) <= 12)
+                          .length
+                      : 0;
+                    const progressPercent = Math.round((completedWeeks / 12) * 100);
+
+                    return (
+                      <tr key={student.id || student.studentNumber} className="hover:bg-slate-700/30 transition-colors">
+                        <td className="px-4 py-3">
+                          <div className="flex items-center gap-3">
+                            <div className="w-10 h-10 bg-amber-600 rounded-full flex items-center justify-center text-white font-bold text-sm">
+                              {student.studentName?.charAt(0) || '?'}
+                            </div>
+                            <div>
+                              <p className="text-white font-medium">{student.studentName}</p>
+                              <p className="text-slate-400 text-xs font-mono">{student.studentNumber}</p>
+                            </div>
+                          </div>
+                        </td>
+                        <td className="px-4 py-3">
+                          <span className="px-2 py-1 bg-slate-700 rounded text-amber-400 text-sm">{student.sectionNumber}</span>
+                        </td>
+                        <td className="px-4 py-3">
+                          <div className="flex items-center justify-center gap-2">
+                            <div className="w-24 h-2 bg-slate-700 rounded-full overflow-hidden">
+                              <div 
+                                className="h-full bg-gradient-to-r from-amber-500 to-amber-400 transition-all" 
+                                style={{ width: `${progressPercent}%` }} 
+                              />
+                            </div>
+                            <span className="text-slate-400 text-sm">{completedWeeks}/12</span>
+                          </div>
+                        </td>
+                        <td className="px-4 py-3 text-center">
+                          <span className={`font-semibold ${getScoreColor(student.totalScore || 0)}`}>
+                            {student.totalScore || 0}%
+                          </span>
+                        </td>
+                        <td className="px-4 py-3 text-center">
+                          <span className={`px-3 py-1 rounded-full text-sm font-bold border ${getGradeBg(student.overallGrade || 'N/A')} ${getGradeColor(student.overallGrade || 'N/A')}`}>
+                            {student.overallGrade || 'N/A'}
+                          </span>
+                        </td>
+                        <td className="px-4 py-3 text-right">
+                          <button
+                            onClick={() => setSelectedStudent(student)}
+                            className="px-3 py-1.5 bg-amber-600/20 hover:bg-amber-600/30 text-amber-400 rounded-lg text-sm transition-colors"
+                          >
+                            View Details
+                          </button>
+                        </td>
+                      </tr>
+                    );
+                  })}
+                </tbody>
+              </table>
+            </div>
+          )}
+        </div>
       </div>
-      <div class="field">
-        <label>Student Number (8 digits) | الرقم الجامعي</label>
-        <input id="regNum" type="text" placeholder="44012345" maxlength="8">
-      </div>
-      <div class="field">
-        <label>Section | الشعبة</label>
-        <select id="regSection">
-          <option value="2925">2925</option>
-          <option value="567">567</option>
-        </select>
-      </div>
-      <div class="field">
-        <label>Password | كلمة المرور</label>
-        <input id="regPass" type="password" placeholder="At least 4 characters">
-      </div>
-      <div class="field">
-        <label>Confirm Password | تأكيد كلمة المرور</label>
-        <input id="regPass2" type="password" placeholder="Repeat password">
-      </div>
-      <button class="submit-btn green" id="regBtn" onclick="doRegister()">Register | إنشاء الحساب</button>
-      <div class="switch-txt">
-        Already have an account? <button onclick="show('loginView')">Sign In | دخول</button>
-      </div>
+
+      {/* Footer */}
+      <footer className="py-6 text-center border-t border-slate-800 mt-8">
+        <p className="text-slate-500 text-sm">0502241-3 | Taif University | جامعة الطائف</p>
+        <p className="text-slate-600 text-xs mt-2">Admin Dashboard - College of Computers & Information Technology</p>
+      </footer>
+
+      {/* Student Detail Modal */}
+      {selectedStudent && (
+        <StudentDetailModal student={selectedStudent} onClose={() => setSelectedStudent(null)} />
+      )}
     </div>
-  </div>
+  );
+};
 
-  <div id="successView" class="view">
-    <div class="card">
-      <span class="success-icon">🎉</span>
-      <div class="success-name" id="successName">Welcome!</div>
-      <div class="success-info" id="successInfo"></div>
-      <button class="submit-btn" onclick="goToCourse()" style="margin-top:8px">Go to Course | الدخول للمقرر →</button>
-      <div class="redirect-bar"><div class="redirect-fill"></div></div>
-      <p style="text-align:center;font-size:12px;color:var(--s600);margin-top:8px">Redirecting automatically in 3 seconds…</p>
-    </div>
-  </div>
 
-</div>
+    // ---- WeekLesson ----
 
-<script>
-const { createClient } = supabase;
-const sb = createClient(
-  'https://xpratnlbivtubelufvbt.supabase.co',
-  'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InhwcmF0bmxiaXZ0dWJlbHVmdmJ0Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzczNjEwNjksImV4cCI6MjA5MjkzNzA2OX0.4e3HYcmageG_-FTTiApcc_DZ2N0ofVdJzlEI25AsvqQ'
+const WeekLesson = ({ weekNum, user, onNavigate, onExerciseComplete, onLogout }) => {
+  const [currentStep, setCurrentStep] = useState(0);
+  const [showExercise, setShowExercise] = useState(false);
+  const [exerciseAnswers, setExerciseAnswers] = useState({});
+  const [exerciseSubmitted, setExerciseSubmitted] = useState(false);
+  const [exerciseScore, setExerciseScore] = useState(0);
+
+  // Week content data with YouTube videos
+  const weekData = {
+    1: {
+      titleEn: "Introduction to Databases",
+      titleAr: "مقدمة في قواعد البيانات",
+      icon: "🗄️",
+      video: {
+        title: "What is a Database?",
+        titleAr: "ما هي قاعدة البيانات؟",
+        youtubeId: "wR0jg0eQsZA",
+        description: "Learn the fundamentals of databases and why they're essential for modern applications."
+      },
+      content: [
+        {
+          type: "intro",
+          titleEn: "Welcome to Week 1!",
+          titleAr: "مرحباً بك في الأسبوع الأول!",
+          contentEn: "This week we'll learn the fundamentals of databases and Database Management Systems (DBMS). By the end, you'll understand what databases are and how to install MySQL.",
+          contentAr: "هذا الأسبوع سنتعلم أساسيات قواعد البيانات وأنظمة إدارة قواعد البيانات. في النهاية، ستفهم ما هي قواعد البيانات وكيفية تثبيت MySQL."
+        },
+        {
+          type: "concept",
+          titleEn: "What is a Database?",
+          titleAr: "ما هي قاعدة البيانات؟",
+          contentEn: "A database is an organized collection of structured data stored electronically. Think of it like a digital filing cabinet where information is stored in tables (like spreadsheets) that can be easily searched, updated, and managed.",
+          contentAr: "قاعدة البيانات هي مجموعة منظمة من البيانات المهيكلة المخزنة إلكترونياً. فكر فيها مثل خزانة ملفات رقمية حيث يتم تخزين المعلومات في جداول يمكن البحث فيها وتحديثها وإدارتها بسهولة.",
+          keyPoints: [
+            { en: "Stores data in organized tables", ar: "تخزن البيانات في جداول منظمة" },
+            { en: "Allows quick searching and retrieval", ar: "تسمح بالبحث والاسترجاع السريع" },
+            { en: "Maintains data integrity and security", ar: "تحافظ على سلامة البيانات وأمانها" },
+            { en: "Supports multiple users simultaneously", ar: "تدعم مستخدمين متعددين في وقت واحد" }
+          ]
+        },
+        {
+          type: "concept",
+          titleEn: "What is a DBMS?",
+          titleAr: "ما هو نظام إدارة قواعد البيانات؟",
+          contentEn: "A Database Management System (DBMS) is software that manages databases. It provides tools to create, read, update, and delete data (CRUD operations). Popular examples include MySQL, PostgreSQL, SQL Server, and Oracle.",
+          contentAr: "نظام إدارة قواعد البيانات هو برنامج يدير قواعد البيانات. يوفر أدوات لإنشاء البيانات وقراءتها وتحديثها وحذفها. الأمثلة الشائعة تشمل MySQL و PostgreSQL و SQL Server و Oracle.",
+          keyPoints: [
+            { en: "MySQL - Free, open-source, widely used", ar: "MySQL - مجاني، مفتوح المصدر، واسع الاستخدام" },
+            { en: "PostgreSQL - Advanced features, enterprise-ready", ar: "PostgreSQL - ميزات متقدمة، جاهز للمؤسسات" },
+            { en: "SQL Server - Microsoft's enterprise solution", ar: "SQL Server - حل مايكروسوفت للمؤسسات" },
+            { en: "Oracle - Industry leader for large enterprises", ar: "Oracle - رائد الصناعة للمؤسسات الكبيرة" }
+          ]
+        },
+        {
+          type: "hands-on",
+          titleEn: "Install MySQL & MySQL Workbench",
+          titleAr: "تثبيت MySQL و MySQL Workbench",
+          steps: [
+            { en: "Download MySQL from dev.mysql.com/downloads/mysql", ar: "قم بتنزيل MySQL من dev.mysql.com/downloads/mysql" },
+            { en: "Run the installer and select 'Developer Default'", ar: "قم بتشغيل المثبت واختر 'Developer Default'" },
+            { en: "Set a root password (remember it!)", ar: "قم بتعيين كلمة مرور root (تذكرها!)" },
+            { en: "Download MySQL Workbench from dev.mysql.com/downloads/workbench", ar: "قم بتنزيل MySQL Workbench" },
+            { en: "Open Workbench and connect to localhost:3306", ar: "افتح Workbench واتصل بـ localhost:3306" }
+          ]
+        }
+      ],
+      exercises: [
+        { q: "What does DBMS stand for?", qAr: "ماذا يعني DBMS؟", options: ["Database Management System", "Data Base Main Server", "Digital Base Memory System", "Data Binary Management Software"], correct: 0 },
+        { q: "Which is NOT a DBMS?", qAr: "أي مما يلي ليس DBMS؟", options: ["MySQL", "PostgreSQL", "Microsoft Word", "Oracle"], correct: 2 },
+        { q: "What is the default MySQL port?", qAr: "ما هو منفذ MySQL الافتراضي؟", options: ["8080", "3306", "80", "443"], correct: 1 },
+        { q: "A database stores data:", qAr: "قاعدة البيانات تخزن البيانات:", options: ["On paper", "Electronically", "In memory only", "Temporarily"], correct: 1 },
+        { q: "MySQL Workbench is used to:", qAr: "يستخدم MySQL Workbench لـ:", options: ["Write documents", "Create spreadsheets", "Manage MySQL databases", "Browse the internet"], correct: 2 }
+      ]
+    },
+    2: {
+      titleEn: "Creating a Database",
+      titleAr: "إنشاء قاعدة بيانات",
+      icon: "📁",
+      video: {
+        title: "MySQL CREATE DATABASE Tutorial",
+        titleAr: "شرح إنشاء قاعدة البيانات",
+        youtubeId: "EN6Dx22cPRI",
+        description: "Learn how to create and manage databases in MySQL using SQL commands."
+      },
+      content: [
+        {
+          type: "intro",
+          titleEn: "Welcome to Week 2!",
+          titleAr: "مرحباً بك في الأسبوع الثاني!",
+          contentEn: "This week we'll learn how to create databases and use basic SQL commands. You'll create your first database called 'UniversityDB'.",
+          contentAr: "هذا الأسبوع سنتعلم كيفية إنشاء قواعد البيانات واستخدام أوامر SQL الأساسية. ستنشئ قاعدة بياناتك الأولى باسم 'UniversityDB'."
+        },
+        {
+          type: "sql",
+          titleEn: "CREATE DATABASE Command",
+          titleAr: "أمر CREATE DATABASE",
+          code: "CREATE DATABASE UniversityDB;",
+          explanation: "This command creates a new database named 'UniversityDB'. Database names are case-sensitive on Linux but not on Windows.",
+          explanationAr: "هذا الأمر ينشئ قاعدة بيانات جديدة باسم 'UniversityDB'. أسماء قواعد البيانات حساسة لحالة الأحرف على Linux."
+        },
+        {
+          type: "sql",
+          titleEn: "SHOW DATABASES Command",
+          titleAr: "أمر SHOW DATABASES",
+          code: "SHOW DATABASES;",
+          explanation: "Lists all databases on your MySQL server. You should see UniversityDB in the list after creating it.",
+          explanationAr: "يعرض جميع قواعد البيانات على خادم MySQL الخاص بك."
+        },
+        {
+          type: "sql",
+          titleEn: "USE Database Command",
+          titleAr: "أمر USE",
+          code: "USE UniversityDB;",
+          explanation: "Selects the database you want to work with. All subsequent commands will apply to this database.",
+          explanationAr: "يحدد قاعدة البيانات التي تريد العمل معها. جميع الأوامر اللاحقة ستطبق على هذه القاعدة."
+        },
+        {
+          type: "sql",
+          titleEn: "DROP DATABASE Command",
+          titleAr: "أمر DROP DATABASE",
+          code: "DROP DATABASE UniversityDB;",
+          explanation: "⚠️ CAUTION: This permanently deletes the database and ALL its data! Use with extreme care.",
+          explanationAr: "⚠️ تحذير: هذا يحذف قاعدة البيانات وجميع بياناتها نهائياً! استخدمه بحذر شديد."
+        }
+      ],
+      exercises: [
+        { q: "Which command creates a new database?", qAr: "أي أمر ينشئ قاعدة بيانات جديدة؟", options: ["NEW DATABASE", "CREATE DATABASE", "MAKE DATABASE", "ADD DATABASE"], correct: 1 },
+        { q: "What does USE command do?", qAr: "ماذا يفعل أمر USE؟", options: ["Creates a database", "Deletes a database", "Selects a database", "Shows databases"], correct: 2 },
+        { q: "SQL statements end with:", qAr: "تنتهي أوامر SQL بـ:", options: ["Period (.)", "Semicolon (;)", "Colon (:)", "Comma (,)"], correct: 1 },
+        { q: "DROP DATABASE will:", qAr: "DROP DATABASE سوف:", options: ["Pause the database", "Delete the database permanently", "Rename the database", "Copy the database"], correct: 1 },
+        { q: "To see all databases, use:", qAr: "لعرض جميع قواعد البيانات، استخدم:", options: ["LIST DATABASES", "SHOW DATABASES", "VIEW DATABASES", "GET DATABASES"], correct: 1 }
+      ]
+    },
+    3: {
+      titleEn: "Creating Tables (Part 1)",
+      titleAr: "إنشاء الجداول (الجزء 1)",
+      icon: "📋",
+      video: {
+        title: "MySQL CREATE TABLE Tutorial",
+        titleAr: "شرح إنشاء الجداول",
+        youtubeId: "EaRj0S3K32Y",
+        description: "Learn how to create tables with columns, data types, and primary keys in MySQL."
+      },
+      content: [
+        {
+          type: "intro",
+          titleEn: "Welcome to Week 3!",
+          titleAr: "مرحباً بك في الأسبوع الثالث!",
+          contentEn: "This week we'll learn how to create tables with different data types. Tables are the core of databases - they store all your data in rows and columns.",
+          contentAr: "هذا الأسبوع سنتعلم كيفية إنشاء الجداول بأنواع بيانات مختلفة. الجداول هي جوهر قواعد البيانات - فهي تخزن جميع بياناتك في صفوف وأعمدة."
+        },
+        {
+          type: "concept",
+          titleEn: "Understanding Data Types",
+          titleAr: "فهم أنواع البيانات",
+          contentEn: "Every column in a table must have a data type that defines what kind of data it can store.",
+          contentAr: "كل عمود في الجدول يجب أن يكون له نوع بيانات يحدد نوع البيانات التي يمكن تخزينها.",
+          keyPoints: [
+            { en: "INT - Integer numbers (1, 2, 100, -50)", ar: "INT - أرقام صحيحة (1، 2، 100، -50)" },
+            { en: "VARCHAR(n) - Variable text up to n characters", ar: "VARCHAR(n) - نص متغير حتى n حرف" },
+            { en: "DATE - Date values (YYYY-MM-DD)", ar: "DATE - قيم التاريخ (YYYY-MM-DD)" },
+            { en: "DECIMAL(p,s) - Decimal numbers with precision", ar: "DECIMAL(p,s) - أرقام عشرية بدقة محددة" },
+            { en: "BOOLEAN - True/False values", ar: "BOOLEAN - قيم صح/خطأ" }
+          ]
+        },
+        {
+          type: "sql",
+          titleEn: "CREATE TABLE Students",
+          titleAr: "إنشاء جدول الطلاب",
+          code: `CREATE TABLE Students (
+    StudentID INT PRIMARY KEY AUTO_INCREMENT,
+    FirstName VARCHAR(50) NOT NULL,
+    LastName VARCHAR(50) NOT NULL,
+    Email VARCHAR(100) UNIQUE,
+    DateOfBirth DATE,
+    EnrollmentDate DATE DEFAULT CURRENT_DATE
+);`,
+          explanation: "Creates a Students table with ID as primary key, required names, unique email, and dates.",
+          explanationAr: "ينشئ جدول الطلاب مع المعرف كمفتاح أساسي، والأسماء المطلوبة، والبريد الإلكتروني الفريد، والتواريخ."
+        },
+        {
+          type: "concept",
+          titleEn: "Key Constraints",
+          titleAr: "قيود المفاتيح",
+          contentEn: "Constraints are rules that enforce data integrity in your tables.",
+          contentAr: "القيود هي قواعد تفرض سلامة البيانات في جداولك.",
+          keyPoints: [
+            { en: "PRIMARY KEY - Unique identifier for each row", ar: "PRIMARY KEY - معرف فريد لكل صف" },
+            { en: "AUTO_INCREMENT - Automatically generates sequential numbers", ar: "AUTO_INCREMENT - يولد أرقام متتالية تلقائياً" },
+            { en: "NOT NULL - Column cannot be empty", ar: "NOT NULL - العمود لا يمكن أن يكون فارغاً" },
+            { en: "UNIQUE - No duplicate values allowed", ar: "UNIQUE - لا يسمح بقيم مكررة" },
+            { en: "DEFAULT - Sets a default value if none provided", ar: "DEFAULT - يعين قيمة افتراضية إذا لم يتم تقديم قيمة" }
+          ]
+        }
+      ],
+      exercises: [
+        { q: "PRIMARY KEY ensures:", qAr: "PRIMARY KEY يضمن:", options: ["Values can be null", "Each row is unique", "Values are text", "Values are dates"], correct: 1 },
+        { q: "AUTO_INCREMENT does what?", qAr: "ماذا يفعل AUTO_INCREMENT؟", options: ["Decreases value", "Automatically increases ID", "Deletes rows", "Creates tables"], correct: 1 },
+        { q: "VARCHAR(50) means:", qAr: "VARCHAR(50) يعني:", options: ["Exactly 50 characters", "Up to 50 characters", "50 numbers", "50 rows"], correct: 1 },
+        { q: "NOT NULL means:", qAr: "NOT NULL يعني:", options: ["Can be empty", "Must have a value", "Is zero", "Is text"], correct: 1 },
+        { q: "INT type stores:", qAr: "نوع INT يخزن:", options: ["Text", "Integer numbers", "Decimal numbers", "Dates"], correct: 1 }
+      ]
+    },
+    4: {
+      titleEn: "Creating Tables (Part 2) - Foreign Keys",
+      titleAr: "إنشاء الجداول (الجزء 2) - المفاتيح الخارجية",
+      icon: "🔗",
+      video: {
+        title: "MySQL Foreign Keys Explained",
+        titleAr: "شرح المفاتيح الخارجية",
+        youtubeId: "4q-keGvUnag",
+        description: "Understanding relationships between tables using foreign keys in MySQL."
+      },
+      content: [
+        {
+          type: "intro",
+          titleEn: "Welcome to Week 4!",
+          titleAr: "مرحباً بك في الأسبوع الرابع!",
+          contentEn: "This week we'll learn about foreign keys - the way to link tables together and create relationships in our database.",
+          contentAr: "هذا الأسبوع سنتعلم عن المفاتيح الخارجية - طريقة ربط الجداول معاً وإنشاء علاقات في قاعدة بياناتنا."
+        },
+        {
+          type: "concept",
+          titleEn: "What is a Foreign Key?",
+          titleAr: "ما هو المفتاح الخارجي؟",
+          contentEn: "A foreign key is a column that creates a link between two tables. It references the primary key of another table, ensuring data consistency.",
+          contentAr: "المفتاح الخارجي هو عمود ينشئ رابطاً بين جدولين. يشير إلى المفتاح الأساسي لجدول آخر، مما يضمن تناسق البيانات.",
+          keyPoints: [
+            { en: "Links child table to parent table", ar: "يربط الجدول الفرعي بالجدول الأب" },
+            { en: "Values must exist in referenced table", ar: "القيم يجب أن تكون موجودة في الجدول المرجعي" },
+            { en: "Maintains referential integrity", ar: "يحافظ على التكامل المرجعي" },
+            { en: "Prevents orphan records", ar: "يمنع السجلات اليتيمة" }
+          ]
+        },
+        {
+          type: "sql",
+          titleEn: "Create Departments Table (Parent)",
+          titleAr: "إنشاء جدول الأقسام (الأب)",
+          code: `CREATE TABLE Departments (
+    DepartmentID INT PRIMARY KEY AUTO_INCREMENT,
+    DepartmentName VARCHAR(100) NOT NULL,
+    Location VARCHAR(100)
+);`,
+          explanation: "First, create the parent table that will be referenced by other tables.",
+          explanationAr: "أولاً، أنشئ الجدول الأب الذي ستشير إليه الجداول الأخرى."
+        },
+        {
+          type: "sql",
+          titleEn: "Create Instructors Table with Foreign Key",
+          titleAr: "إنشاء جدول المدرسين مع مفتاح خارجي",
+          code: `CREATE TABLE Instructors (
+    InstructorID INT PRIMARY KEY AUTO_INCREMENT,
+    Name VARCHAR(100) NOT NULL,
+    Email VARCHAR(100) UNIQUE,
+    DepartmentID INT,
+    FOREIGN KEY (DepartmentID) REFERENCES Departments(DepartmentID)
+        ON DELETE SET NULL
+        ON UPDATE CASCADE
+);`,
+          explanation: "Creates Instructors table linked to Departments. ON DELETE SET NULL means if a department is deleted, instructor's DepartmentID becomes NULL.",
+          explanationAr: "ينشئ جدول المدرسين مرتبطاً بالأقسام. ON DELETE SET NULL يعني إذا حُذف القسم، يصبح DepartmentID للمدرس NULL."
+        }
+      ],
+      exercises: [
+        { q: "FOREIGN KEY is used to:", qAr: "يستخدم FOREIGN KEY لـ:", options: ["Create unique values", "Link tables together", "Store dates", "Delete data"], correct: 1 },
+        { q: "REFERENCES keyword specifies:", qAr: "كلمة REFERENCES تحدد:", options: ["Column name", "Parent table and column", "Data type", "Row number"], correct: 1 },
+        { q: "ON DELETE CASCADE means:", qAr: "ON DELETE CASCADE يعني:", options: ["Prevent deletion", "Delete related rows too", "Set to NULL", "Do nothing"], correct: 1 },
+        { q: "Parent table must be created:", qAr: "الجدول الأب يجب إنشاؤه:", options: ["After child table", "Before child table", "At same time", "Never"], correct: 1 },
+        { q: "A foreign key value must exist in:", qAr: "قيمة المفتاح الخارجي يجب أن توجد في:", options: ["Same table", "Referenced table", "Any table", "No table"], correct: 1 }
+      ]
+    },
+    5: {
+      titleEn: "Creating Tables (Part 3) - Junction Tables",
+      titleAr: "إنشاء الجداول (الجزء 3) - جداول الربط",
+      icon: "📊",
+      video: {
+        title: "Many-to-Many Relationships in MySQL",
+        titleAr: "علاقات متعدد لمتعدد",
+        youtubeId: "1eUn6lsZ7c4",
+        description: "Learn how to create junction tables for many-to-many relationships."
+      },
+      content: [
+        {
+          type: "intro",
+          titleEn: "Welcome to Week 5!",
+          titleAr: "مرحباً بك في الأسبوع الخامس!",
+          contentEn: "This week we'll learn about junction tables - special tables that connect two other tables in a many-to-many relationship.",
+          contentAr: "هذا الأسبوع سنتعلم عن جداول الربط - جداول خاصة تربط جدولين آخرين في علاقة متعدد لمتعدد."
+        },
+        {
+          type: "concept",
+          titleEn: "Many-to-Many Relationships",
+          titleAr: "علاقات متعدد لمتعدد",
+          contentEn: "When one student can enroll in many courses, and one course can have many students, we have a many-to-many relationship. This requires a junction table.",
+          contentAr: "عندما يمكن لطالب واحد التسجيل في عدة مقررات، ويمكن لمقرر واحد أن يضم عدة طلاب، لدينا علاقة متعدد لمتعدد. هذا يتطلب جدول ربط.",
+          keyPoints: [
+            { en: "Student → Many Courses", ar: "طالب ← عدة مقررات" },
+            { en: "Course → Many Students", ar: "مقرر ← عدة طلاب" },
+            { en: "Junction table connects both", ar: "جدول الربط يربط كليهما" },
+            { en: "Contains foreign keys to both tables", ar: "يحتوي على مفاتيح خارجية لكلا الجدولين" }
+          ]
+        },
+        {
+          type: "sql",
+          titleEn: "Create Courses Table",
+          titleAr: "إنشاء جدول المقررات",
+          code: `CREATE TABLE Courses (
+    CourseID INT PRIMARY KEY AUTO_INCREMENT,
+    CourseName VARCHAR(100) NOT NULL,
+    CourseCode VARCHAR(10) UNIQUE,
+    Credits INT DEFAULT 3,
+    DepartmentID INT,
+    FOREIGN KEY (DepartmentID) REFERENCES Departments(DepartmentID)
+);`,
+          explanation: "Creates a Courses table with a link to Departments.",
+          explanationAr: "ينشئ جدول المقررات مع رابط للأقسام."
+        },
+        {
+          type: "sql",
+          titleEn: "Create Enrollments Junction Table",
+          titleAr: "إنشاء جدول التسجيلات (جدول الربط)",
+          code: `CREATE TABLE Enrollments (
+    EnrollmentID INT PRIMARY KEY AUTO_INCREMENT,
+    StudentID INT NOT NULL,
+    CourseID INT NOT NULL,
+    EnrollmentDate DATE DEFAULT CURRENT_DATE,
+    Grade CHAR(2),
+    FOREIGN KEY (StudentID) REFERENCES Students(StudentID)
+        ON DELETE CASCADE,
+    FOREIGN KEY (CourseID) REFERENCES Courses(CourseID)
+        ON DELETE CASCADE,
+    UNIQUE(StudentID, CourseID)  -- Prevent duplicate enrollments
+);`,
+          explanation: "Junction table linking Students and Courses with enrollment details.",
+          explanationAr: "جدول ربط يصل الطلاب والمقررات مع تفاصيل التسجيل."
+        }
+      ],
+      exercises: [
+        { q: "A junction table:", qAr: "جدول الربط:", options: ["Has no keys", "Links two tables in M:N relationship", "Stores only dates", "Has one column"], correct: 1 },
+        { q: "UNIQUE(StudentID, CourseID) prevents:", qAr: "UNIQUE(StudentID, CourseID) يمنع:", options: ["All enrollments", "Duplicate enrollments", "New students", "New courses"], correct: 1 },
+        { q: "CHAR(2) for Grade stores:", qAr: "CHAR(2) للدرجة يخزن:", options: ["Two numbers", "Exactly 2 characters", "Two words", "Two rows"], correct: 1 },
+        { q: "Many-to-Many requires:", qAr: "علاقة متعدد لمتعدد تتطلب:", options: ["One table", "Two tables", "Three tables (including junction)", "No tables"], correct: 2 },
+        { q: "ON DELETE CASCADE in junction table:", qAr: "ON DELETE CASCADE في جدول الربط:", options: ["Keeps orphan records", "Deletes enrollment if student/course deleted", "Prevents all deletions", "Does nothing"], correct: 1 }
+      ]
+    },
+    6: {
+      titleEn: "Inserting Data (Part 1)",
+      titleAr: "إدراج البيانات (الجزء 1)",
+      icon: "✏️",
+      video: {
+        title: "MySQL INSERT Statement Tutorial",
+        titleAr: "شرح إدراج البيانات",
+        youtubeId: "D2_3MbakK9Q",
+        description: "Learn how to insert data into MySQL tables using the INSERT statement."
+      },
+      content: [
+        {
+          type: "intro",
+          titleEn: "Welcome to Week 6!",
+          titleAr: "مرحباً بك في الأسبوع السادس!",
+          contentEn: "Now that we have our tables, let's learn how to add data to them using the INSERT command.",
+          contentAr: "الآن بعد أن أنشأنا جداولنا، دعنا نتعلم كيفية إضافة البيانات إليها باستخدام أمر INSERT."
+        },
+        {
+          type: "sql",
+          titleEn: "Basic INSERT Statement",
+          titleAr: "عبارة INSERT الأساسية",
+          code: `-- Insert a department first (parent table)
+INSERT INTO Departments (DepartmentName, Location)
+VALUES ('Computer Science', 'Building A');
+
+-- Insert a student
+INSERT INTO Students (FirstName, LastName, Email, DateOfBirth)
+VALUES ('Ahmed', 'Al-Saud', 'ahmed@university.edu', '2000-05-15');`,
+          explanation: "Always insert into parent tables first, then child tables. Specify column names for clarity.",
+          explanationAr: "دائماً أدرج في الجداول الأب أولاً، ثم الجداول الفرعية. حدد أسماء الأعمدة للوضوح."
+        },
+        {
+          type: "sql",
+          titleEn: "Insert Multiple Rows",
+          titleAr: "إدراج صفوف متعددة",
+          code: `INSERT INTO Students (FirstName, LastName, Email, DateOfBirth)
+VALUES 
+    ('Mohammed', 'Ali', 'mohammed@university.edu', '2001-03-20'),
+    ('Fatima', 'Hassan', 'fatima@university.edu', '2000-11-08'),
+    ('Omar', 'Ibrahim', 'omar@university.edu', '2002-01-25');`,
+          explanation: "Insert multiple rows in a single statement for better performance.",
+          explanationAr: "أدرج صفوفاً متعددة في عبارة واحدة لأداء أفضل."
+        },
+        {
+          type: "concept",
+          titleEn: "INSERT Best Practices",
+          titleAr: "أفضل ممارسات INSERT",
+          contentEn: "Follow these guidelines for successful data insertion.",
+          contentAr: "اتبع هذه الإرشادات لإدراج بيانات ناجح.",
+          keyPoints: [
+            { en: "Text values use single quotes: 'Ahmed'", ar: "القيم النصية تستخدم علامات اقتباس مفردة: 'Ahmed'" },
+            { en: "Dates use format: 'YYYY-MM-DD'", ar: "التواريخ تستخدم الصيغة: 'YYYY-MM-DD'" },
+            { en: "Numbers don't need quotes: 100", ar: "الأرقام لا تحتاج علامات اقتباس: 100" },
+            { en: "NULL means no value: NULL (no quotes)", ar: "NULL تعني لا قيمة: NULL (بدون علامات)" },
+            { en: "AUTO_INCREMENT columns are skipped", ar: "أعمدة AUTO_INCREMENT يتم تخطيها" }
+          ]
+        }
+      ],
+      exercises: [
+        { q: "INSERT INTO adds:", qAr: "INSERT INTO يضيف:", options: ["Tables", "Databases", "Records/Rows", "Columns"], correct: 2 },
+        { q: "VALUES keyword contains:", qAr: "كلمة VALUES تحتوي:", options: ["Column names", "Data to insert", "Table names", "Conditions"], correct: 1 },
+        { q: "Date format in MySQL:", qAr: "صيغة التاريخ في MySQL:", options: ["DD-MM-YYYY", "YYYY-MM-DD", "MM/DD/YYYY", "YYYY/DD/MM"], correct: 1 },
+        { q: "Text values are enclosed in:", qAr: "القيم النصية تحاط بـ:", options: ["Double quotes", "Parentheses", "Single quotes", "Brackets"], correct: 2 },
+        { q: "AUTO_INCREMENT columns:", qAr: "أعمدة AUTO_INCREMENT:", options: ["Must be specified", "Are auto-filled", "Cannot be used", "Store text"], correct: 1 }
+      ]
+    },
+    7: {
+      titleEn: "Inserting Data (Part 2) - Foreign Keys",
+      titleAr: "إدراج البيانات (الجزء 2) - المفاتيح الخارجية",
+      icon: "📝",
+      video: {
+        title: "Inserting Data with Foreign Keys",
+        titleAr: "إدراج البيانات مع المفاتيح الخارجية",
+        youtubeId: "9WEn-BJSpKM",
+        description: "Learn the correct order for inserting data when tables have foreign key relationships."
+      },
+      content: [
+        {
+          type: "intro",
+          titleEn: "Welcome to Week 7!",
+          titleAr: "مرحباً بك في الأسبوع السابع!",
+          contentEn: "This week we'll learn the correct order for inserting data when tables are linked with foreign keys.",
+          contentAr: "هذا الأسبوع سنتعلم الترتيب الصحيح لإدراج البيانات عندما تكون الجداول مرتبطة بالمفاتيح الخارجية."
+        },
+        {
+          type: "concept",
+          titleEn: "Insertion Order Matters!",
+          titleAr: "ترتيب الإدراج مهم!",
+          contentEn: "When tables are linked, you must insert data in the correct order to avoid foreign key errors.",
+          contentAr: "عندما تكون الجداول مرتبطة، يجب إدراج البيانات بالترتيب الصحيح لتجنب أخطاء المفتاح الخارجي.",
+          keyPoints: [
+            { en: "1. Departments (no dependencies)", ar: "1. الأقسام (بدون تبعيات)" },
+            { en: "2. Students (no dependencies)", ar: "2. الطلاب (بدون تبعيات)" },
+            { en: "3. Instructors (depends on Departments)", ar: "3. المدرسون (يعتمد على الأقسام)" },
+            { en: "4. Courses (depends on Departments)", ar: "4. المقررات (يعتمد على الأقسام)" },
+            { en: "5. Enrollments (depends on Students & Courses)", ar: "5. التسجيلات (يعتمد على الطلاب والمقررات)" }
+          ]
+        },
+        {
+          type: "sql",
+          titleEn: "Insert Course (with Foreign Key)",
+          titleAr: "إدراج مقرر (مع مفتاح خارجي)",
+          code: `-- First, check DepartmentID exists
+SELECT * FROM Departments;  -- See ID 1 = 'Computer Science'
+
+-- Insert course with valid DepartmentID
+INSERT INTO Courses (CourseName, CourseCode, Credits, DepartmentID)
+VALUES ('Database Systems', 'CS301', 3, 1);
+
+-- This will FAIL - Department 999 doesn't exist!
+INSERT INTO Courses (CourseName, CourseCode, Credits, DepartmentID)
+VALUES ('Invalid Course', 'XX999', 3, 999);  -- ERROR!`,
+          explanation: "Foreign key values MUST exist in the parent table, or you'll get an error.",
+          explanationAr: "قيم المفتاح الخارجي يجب أن تكون موجودة في الجدول الأب، وإلا ستحصل على خطأ."
+        },
+        {
+          type: "sql",
+          titleEn: "Insert Enrollment (Junction Table)",
+          titleAr: "إدراج تسجيل (جدول الربط)",
+          code: `-- Enroll StudentID 1 in CourseID 1
+INSERT INTO Enrollments (StudentID, CourseID, EnrollmentDate)
+VALUES (1, 1, '2024-09-01');
+
+-- Enroll same student in another course
+INSERT INTO Enrollments (StudentID, CourseID)
+VALUES (1, 2);  -- Uses default date
+
+-- Add grade later
+UPDATE Enrollments SET Grade = 'A' 
+WHERE StudentID = 1 AND CourseID = 1;`,
+          explanation: "Junction tables require valid foreign keys from BOTH related tables.",
+          explanationAr: "جداول الربط تتطلب مفاتيح خارجية صالحة من كلا الجدولين المرتبطين."
+        }
+      ],
+      exercises: [
+        { q: "Foreign key values must:", qAr: "قيم المفتاح الخارجي يجب:", options: ["Be null", "Exist in parent table", "Be text", "Be auto-generated"], correct: 1 },
+        { q: "Inserting invalid FK causes:", qAr: "إدراج FK غير صالح يسبب:", options: ["Success", "Warning", "Error", "Nothing"], correct: 2 },
+        { q: "Parent table must be filled:", qAr: "الجدول الأب يجب ملؤه:", options: ["Last", "First", "Never", "Randomly"], correct: 1 },
+        { q: "Enrollments table requires:", qAr: "جدول التسجيلات يتطلب:", options: ["StudentID only", "CourseID only", "Both StudentID and CourseID", "Neither"], correct: 2 },
+        { q: "To add grade after enrollment:", qAr: "لإضافة الدرجة بعد التسجيل:", options: ["INSERT new row", "UPDATE existing row", "DELETE and re-add", "Not possible"], correct: 1 }
+      ]
+    },
+    8: {
+      titleEn: "SELECT Queries (Part 1)",
+      titleAr: "استعلامات SELECT (الجزء 1)",
+      icon: "🔍",
+      video: {
+        title: "MySQL SELECT Statement Tutorial",
+        titleAr: "شرح استعلام SELECT",
+        youtubeId: "7S_tz1z_5bA",
+        description: "Master the SELECT statement - the most important SQL command for retrieving data."
+      },
+      content: [
+        {
+          type: "intro",
+          titleEn: "Welcome to Week 8!",
+          titleAr: "مرحباً بك في الأسبوع الثامن!",
+          contentEn: "SELECT is the most used SQL command. It retrieves data from your database without modifying anything.",
+          contentAr: "SELECT هو أكثر أوامر SQL استخداماً. يسترجع البيانات من قاعدة بياناتك دون تعديل أي شيء."
+        },
+        {
+          type: "sql",
+          titleEn: "Basic SELECT",
+          titleAr: "SELECT الأساسي",
+          code: `-- Select all columns from Students
+SELECT * FROM Students;
+
+-- Select specific columns
+SELECT FirstName, LastName, Email FROM Students;
+
+-- Select with alias
+SELECT FirstName AS 'First Name', LastName AS 'Last Name' 
+FROM Students;`,
+          explanation: "* means all columns. Specify column names to retrieve only what you need.",
+          explanationAr: "* تعني جميع الأعمدة. حدد أسماء الأعمدة لاسترجاع ما تحتاجه فقط."
+        },
+        {
+          type: "sql",
+          titleEn: "WHERE Clause - Filtering Data",
+          titleAr: "جملة WHERE - تصفية البيانات",
+          code: `-- Find student by ID
+SELECT * FROM Students WHERE StudentID = 1;
+
+-- Find students born after 2000
+SELECT * FROM Students WHERE DateOfBirth > '2000-01-01';
+
+-- Find students with specific email domain
+SELECT * FROM Students WHERE Email LIKE '%@university.edu';
+
+-- Multiple conditions
+SELECT * FROM Students 
+WHERE DateOfBirth > '2000-01-01' AND Email IS NOT NULL;`,
+          explanation: "WHERE filters which rows are returned. Use AND/OR to combine conditions.",
+          explanationAr: "WHERE تصفي الصفوف المرتجعة. استخدم AND/OR لدمج الشروط."
+        },
+        {
+          type: "concept",
+          titleEn: "WHERE Operators",
+          titleAr: "عوامل WHERE",
+          contentEn: "Common operators for filtering data in WHERE clause.",
+          contentAr: "العوامل الشائعة لتصفية البيانات في جملة WHERE.",
+          keyPoints: [
+            { en: "= Equal to", ar: "= يساوي" },
+            { en: "<>, != Not equal to", ar: "<>, != لا يساوي" },
+            { en: "> Greater than, < Less than", ar: "> أكبر من، < أصغر من" },
+            { en: "BETWEEN x AND y (range)", ar: "BETWEEN x AND y (مدى)" },
+            { en: "LIKE 'pattern%' (wildcard search)", ar: "LIKE 'pattern%' (بحث بالنمط)" },
+            { en: "IN (value1, value2, ...) (list)", ar: "IN (value1, value2, ...) (قائمة)" },
+            { en: "IS NULL, IS NOT NULL", ar: "IS NULL, IS NOT NULL" }
+          ]
+        }
+      ],
+      exercises: [
+        { q: "SELECT * returns:", qAr: "SELECT * يرجع:", options: ["One column", "All columns", "No columns", "First column"], correct: 1 },
+        { q: "WHERE clause is used to:", qAr: "جملة WHERE تستخدم لـ:", options: ["Sort data", "Filter rows", "Delete data", "Insert data"], correct: 1 },
+        { q: "LIKE '%ahmed%' finds:", qAr: "LIKE '%ahmed%' يجد:", options: ["Exact 'ahmed'", "Starts with ahmed", "Contains ahmed anywhere", "Ends with ahmed"], correct: 2 },
+        { q: "IS NULL checks for:", qAr: "IS NULL يتحقق من:", options: ["Zero value", "Empty string", "Missing value", "Any value"], correct: 2 },
+        { q: "AND combines conditions as:", qAr: "AND يدمج الشروط كـ:", options: ["Either can be true", "Both must be true", "Neither needed", "Opposite"], correct: 1 }
+      ]
+    },
+    9: {
+      titleEn: "SELECT Queries (Part 2) - JOINs",
+      titleAr: "استعلامات SELECT (الجزء 2) - الربط",
+      icon: "🔗",
+      video: {
+        title: "MySQL JOINs Explained",
+        titleAr: "شرح ربط الجداول JOIN",
+        youtubeId: "Jh_pvk48jHA",
+        description: "Learn all types of JOINs to combine data from multiple tables."
+      },
+      content: [
+        {
+          type: "intro",
+          titleEn: "Welcome to Week 9!",
+          titleAr: "مرحباً بك في الأسبوع التاسع!",
+          contentEn: "JOINs are essential for combining data from multiple related tables. This is where relational databases really shine!",
+          contentAr: "الربط (JOIN) ضروري لدمج البيانات من عدة جداول مرتبطة. هذا هو المكان الذي تتألق فيه قواعد البيانات العلائقية!"
+        },
+        {
+          type: "sql",
+          titleEn: "INNER JOIN - Matching Records Only",
+          titleAr: "INNER JOIN - السجلات المتطابقة فقط",
+          code: `-- Get student names with their enrolled courses
+SELECT 
+    s.FirstName,
+    s.LastName,
+    c.CourseName,
+    e.Grade
+FROM Students s
+INNER JOIN Enrollments e ON s.StudentID = e.StudentID
+INNER JOIN Courses c ON e.CourseID = c.CourseID;`,
+          explanation: "INNER JOIN returns only rows that have matching values in both tables.",
+          explanationAr: "INNER JOIN يرجع فقط الصفوف التي لها قيم متطابقة في كلا الجدولين."
+        },
+        {
+          type: "sql",
+          titleEn: "LEFT JOIN - Include All From Left Table",
+          titleAr: "LEFT JOIN - شمل الكل من الجدول الأيسر",
+          code: `-- Get all students, even those not enrolled in any course
+SELECT 
+    s.FirstName,
+    s.LastName,
+    c.CourseName
+FROM Students s
+LEFT JOIN Enrollments e ON s.StudentID = e.StudentID
+LEFT JOIN Courses c ON e.CourseID = c.CourseID;`,
+          explanation: "LEFT JOIN returns all rows from left table, with NULLs where no match exists.",
+          explanationAr: "LEFT JOIN يرجع جميع الصفوف من الجدول الأيسر، مع NULL حيث لا يوجد تطابق."
+        },
+        {
+          type: "concept",
+          titleEn: "Types of JOINs",
+          titleAr: "أنواع الربط",
+          contentEn: "Different JOINs for different needs.",
+          contentAr: "أنواع مختلفة من الربط لاحتياجات مختلفة.",
+          keyPoints: [
+            { en: "INNER JOIN - Only matching rows", ar: "INNER JOIN - الصفوف المتطابقة فقط" },
+            { en: "LEFT JOIN - All from left + matches", ar: "LEFT JOIN - الكل من اليسار + المتطابقات" },
+            { en: "RIGHT JOIN - All from right + matches", ar: "RIGHT JOIN - الكل من اليمين + المتطابقات" },
+            { en: "FULL JOIN - All rows from both tables", ar: "FULL JOIN - جميع الصفوف من الجدولين" }
+          ]
+        }
+      ],
+      exercises: [
+        { q: "INNER JOIN returns:", qAr: "INNER JOIN يرجع:", options: ["All rows", "Only matching rows", "Non-matching rows", "Empty result"], correct: 1 },
+        { q: "LEFT JOIN includes:", qAr: "LEFT JOIN يشمل:", options: ["Right table only", "Matching only", "All from left table", "Nothing"], correct: 2 },
+        { q: "ON specifies:", qAr: "ON تحدد:", options: ["Table name", "Join condition", "Column type", "Sort order"], correct: 1 },
+        { q: "Table alias 's' in 's.FirstName':", qAr: "الاسم المستعار 's' في 's.FirstName':", options: ["Creates new table", "References table", "Deletes table", "Copies table"], correct: 1 },
+        { q: "Multiple JOINs in one query is:", qAr: "عدة JOINs في استعلام واحد:", options: ["Not allowed", "Allowed and common", "Causes errors", "Not recommended"], correct: 1 }
+      ]
+    },
+    10: {
+      titleEn: "Aggregate Functions & GROUP BY",
+      titleAr: "الدوال التجميعية و GROUP BY",
+      icon: "📈",
+      video: {
+        title: "MySQL GROUP BY and Aggregate Functions",
+        titleAr: "الدوال التجميعية و GROUP BY",
+        youtubeId: "DWFHpOkLzLo",
+        description: "Learn to summarize data using COUNT, SUM, AVG, MIN, MAX and GROUP BY."
+      },
+      content: [
+        {
+          type: "intro",
+          titleEn: "Welcome to Week 10!",
+          titleAr: "مرحباً بك في الأسبوع العاشر!",
+          contentEn: "Aggregate functions summarize data - count rows, calculate averages, find maximum values, and more!",
+          contentAr: "الدوال التجميعية تلخص البيانات - عد الصفوف، حساب المتوسطات، إيجاد القيم القصوى، والمزيد!"
+        },
+        {
+          type: "sql",
+          titleEn: "Aggregate Functions",
+          titleAr: "الدوال التجميعية",
+          code: `-- Count all students
+SELECT COUNT(*) AS TotalStudents FROM Students;
+
+-- Count students per department (with JOIN)
+SELECT d.DepartmentName, COUNT(s.StudentID) AS StudentCount
+FROM Departments d
+LEFT JOIN Students s ON d.DepartmentID = s.DepartmentID
+GROUP BY d.DepartmentID;
+
+-- Average, Min, Max for numeric data
+SELECT 
+    AVG(Credits) AS AvgCredits,
+    MIN(Credits) AS MinCredits,
+    MAX(Credits) AS MaxCredits,
+    SUM(Credits) AS TotalCredits
+FROM Courses;`,
+          explanation: "COUNT, AVG, SUM, MIN, MAX summarize data. Use with GROUP BY for grouped results.",
+          explanationAr: "COUNT, AVG, SUM, MIN, MAX تلخص البيانات. استخدمها مع GROUP BY لنتائج مجمعة."
+        },
+        {
+          type: "sql",
+          titleEn: "GROUP BY with HAVING",
+          titleAr: "GROUP BY مع HAVING",
+          code: `-- Find departments with more than 5 students
+SELECT DepartmentID, COUNT(*) AS StudentCount
+FROM Students
+GROUP BY DepartmentID
+HAVING COUNT(*) > 5;
+
+-- Courses with average enrollment > 10 students
+SELECT c.CourseName, COUNT(e.StudentID) AS Enrolled
+FROM Courses c
+JOIN Enrollments e ON c.CourseID = e.CourseID
+GROUP BY c.CourseID
+HAVING COUNT(e.StudentID) > 10
+ORDER BY Enrolled DESC;`,
+          explanation: "HAVING filters grouped results (like WHERE but for groups). ORDER BY sorts the output.",
+          explanationAr: "HAVING تصفي النتائج المجمعة (مثل WHERE لكن للمجموعات). ORDER BY ترتب المخرجات."
+        }
+      ],
+      exercises: [
+        { q: "COUNT(*) returns:", qAr: "COUNT(*) يرجع:", options: ["Sum of values", "Average", "Number of rows", "Maximum value"], correct: 2 },
+        { q: "GROUP BY groups:", qAr: "GROUP BY يجمع:", options: ["Tables", "Databases", "Rows with same values", "Columns"], correct: 2 },
+        { q: "HAVING filters:", qAr: "HAVING تصفي:", options: ["Individual rows", "Grouped results", "Tables", "Databases"], correct: 1 },
+        { q: "AVG() calculates:", qAr: "AVG() تحسب:", options: ["Sum", "Count", "Average", "Maximum"], correct: 2 },
+        { q: "ORDER BY DESC means:", qAr: "ORDER BY DESC يعني:", options: ["Ascending order", "Descending order", "No order", "Random order"], correct: 1 }
+      ]
+    },
+    11: {
+      titleEn: "UPDATE & DELETE Operations",
+      titleAr: "عمليات UPDATE و DELETE",
+      icon: "🔄",
+      video: {
+        title: "MySQL UPDATE and DELETE Tutorial",
+        titleAr: "شرح UPDATE و DELETE",
+        youtubeId: "a8yrFVPwtAc",
+        description: "Learn how to safely modify and delete data in MySQL tables."
+      },
+      content: [
+        {
+          type: "intro",
+          titleEn: "Welcome to Week 11!",
+          titleAr: "مرحباً بك في الأسبوع الحادي عشر!",
+          contentEn: "UPDATE modifies existing data, DELETE removes data. Both are powerful - use with caution!",
+          contentAr: "UPDATE يعدل البيانات الموجودة، DELETE يحذف البيانات. كلاهما قوي - استخدمهما بحذر!"
+        },
+        {
+          type: "sql",
+          titleEn: "UPDATE Statement",
+          titleAr: "عبارة UPDATE",
+          code: `-- Update one student's email
+UPDATE Students 
+SET Email = 'new.email@university.edu'
+WHERE StudentID = 1;
+
+-- Update multiple columns
+UPDATE Students 
+SET 
+    FirstName = 'Mohammed',
+    LastName = 'Al-Rashid',
+    Email = 'mohammed.r@university.edu'
+WHERE StudentID = 2;
+
+-- Update based on condition
+UPDATE Enrollments
+SET Grade = 'A+'
+WHERE CourseID = 1 AND StudentID IN (
+    SELECT StudentID FROM Students WHERE EnrollmentDate < '2024-01-01'
+);`,
+          explanation: "⚠️ ALWAYS use WHERE with UPDATE! Without it, ALL rows will be modified.",
+          explanationAr: "⚠️ دائماً استخدم WHERE مع UPDATE! بدونها، سيتم تعديل جميع الصفوف."
+        },
+        {
+          type: "sql",
+          titleEn: "DELETE Statement",
+          titleAr: "عبارة DELETE",
+          code: `-- Delete one enrollment
+DELETE FROM Enrollments WHERE EnrollmentID = 5;
+
+-- Delete student (will fail if has enrollments with ON DELETE RESTRICT)
+DELETE FROM Students WHERE StudentID = 10;
+
+-- Delete old enrollments
+DELETE FROM Enrollments 
+WHERE EnrollmentDate < '2020-01-01';
+
+-- ⚠️ DANGEROUS: Delete ALL rows (use TRUNCATE instead for speed)
+-- DELETE FROM Students;  -- Don't run this!
+-- TRUNCATE TABLE Students;  -- Faster but can't rollback`,
+          explanation: "⚠️ ALWAYS use WHERE with DELETE! Test with SELECT first to see what will be deleted.",
+          explanationAr: "⚠️ دائماً استخدم WHERE مع DELETE! اختبر بـ SELECT أولاً لترى ما سيُحذف."
+        },
+        {
+          type: "concept",
+          titleEn: "Safety Tips",
+          titleAr: "نصائح السلامة",
+          contentEn: "Protect your data from accidental modification or deletion.",
+          contentAr: "احمِ بياناتك من التعديل أو الحذف العرضي.",
+          keyPoints: [
+            { en: "Always use WHERE clause", ar: "دائماً استخدم جملة WHERE" },
+            { en: "Test with SELECT first", ar: "اختبر بـ SELECT أولاً" },
+            { en: "Use transactions for safety", ar: "استخدم المعاملات للسلامة" },
+            { en: "Backup before bulk changes", ar: "انسخ احتياطياً قبل التغييرات الكبيرة" },
+            { en: "Use LIMIT to restrict affected rows", ar: "استخدم LIMIT لتقييد الصفوف المتأثرة" }
+          ]
+        }
+      ],
+      exercises: [
+        { q: "UPDATE without WHERE:", qAr: "UPDATE بدون WHERE:", options: ["Updates nothing", "Updates one row", "Updates ALL rows", "Causes error"], correct: 2 },
+        { q: "DELETE removes:", qAr: "DELETE يحذف:", options: ["Columns", "Tables", "Rows", "Databases"], correct: 2 },
+        { q: "To test before DELETE, use:", qAr: "للاختبار قبل DELETE، استخدم:", options: ["INSERT", "UPDATE", "SELECT with same WHERE", "DROP"], correct: 2 },
+        { q: "TRUNCATE TABLE:", qAr: "TRUNCATE TABLE:", options: ["Deletes table structure", "Deletes all rows quickly", "Updates rows", "Creates table"], correct: 1 },
+        { q: "SET in UPDATE specifies:", qAr: "SET في UPDATE تحدد:", options: ["Which rows", "New values", "Table name", "Conditions"], correct: 1 }
+      ]
+    },
+    12: {
+      titleEn: "Database Design & Normalization",
+      titleAr: "تصميم قواعد البيانات والتطبيع",
+      icon: "🏗️",
+      video: {
+        title: "Database Normalization Explained",
+        titleAr: "شرح تطبيع قواعد البيانات",
+        youtubeId: "UrYLYV7WSHM",
+        description: "Learn the principles of database normalization: 1NF, 2NF, 3NF explained simply."
+      },
+      content: [
+        {
+          type: "intro",
+          titleEn: "Welcome to Week 12!",
+          titleAr: "مرحباً بك في الأسبوع الثاني عشر!",
+          contentEn: "Good database design prevents data problems. Normalization is the process of organizing data to reduce redundancy.",
+          contentAr: "التصميم الجيد لقاعدة البيانات يمنع مشاكل البيانات. التطبيع هو عملية تنظيم البيانات لتقليل التكرار."
+        },
+        {
+          type: "concept",
+          titleEn: "Why Normalize?",
+          titleAr: "لماذا نُطبّع؟",
+          contentEn: "Normalization solves common data problems.",
+          contentAr: "التطبيع يحل مشاكل البيانات الشائعة.",
+          keyPoints: [
+            { en: "Eliminates duplicate data", ar: "يزيل البيانات المكررة" },
+            { en: "Prevents update anomalies", ar: "يمنع شذوذات التحديث" },
+            { en: "Prevents insert anomalies", ar: "يمنع شذوذات الإدراج" },
+            { en: "Prevents delete anomalies", ar: "يمنع شذوذات الحذف" },
+            { en: "Saves storage space", ar: "يوفر مساحة التخزين" }
+          ]
+        },
+        {
+          type: "concept",
+          titleEn: "Normal Forms",
+          titleAr: "أشكال التطبيع",
+          contentEn: "Three main levels of normalization.",
+          contentAr: "ثلاثة مستويات رئيسية من التطبيع.",
+          keyPoints: [
+            { en: "1NF: Each cell has one value (no lists)", ar: "1NF: كل خلية لها قيمة واحدة (بدون قوائم)" },
+            { en: "1NF: No repeating groups of columns", ar: "1NF: لا مجموعات أعمدة متكررة" },
+            { en: "2NF: Must be in 1NF + No partial dependencies", ar: "2NF: يجب أن يكون في 1NF + لا تبعيات جزئية" },
+            { en: "3NF: Must be in 2NF + No transitive dependencies", ar: "3NF: يجب أن يكون في 2NF + لا تبعيات متعدية" }
+          ]
+        },
+        {
+          type: "sql",
+          titleEn: "Bad vs Good Design Example",
+          titleAr: "مثال تصميم سيء مقابل جيد",
+          code: `-- BAD: Repeating groups, redundant data
+CREATE TABLE BadDesign (
+    StudentID INT,
+    StudentName VARCHAR(100),
+    Course1 VARCHAR(100),
+    Course1Instructor VARCHAR(100),
+    Course2 VARCHAR(100),
+    Course2Instructor VARCHAR(100)
 );
 
-function show(id) {
-  document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
-  document.getElementById(id).classList.add('active');
-  clearAlerts();
-}
+-- GOOD: Normalized - separate tables, no redundancy
+-- Students table, Courses table, Instructors table, Enrollments table
+-- Each piece of data stored once!`,
+          explanation: "Normalized design: change instructor name in ONE place, affects all courses.",
+          explanationAr: "التصميم المُطبّع: غيّر اسم المدرس في مكان واحد، يؤثر على جميع المقررات."
+        }
+      ],
+      exercises: [
+        { q: "1NF requires:", qAr: "1NF يتطلب:", options: ["Lists in cells", "One value per cell", "Empty cells", "Multiple tables"], correct: 1 },
+        { q: "Normalization reduces:", qAr: "التطبيع يقلل:", options: ["Tables", "Columns", "Data redundancy", "Performance"], correct: 2 },
+        { q: "3NF depends on:", qAr: "3NF يعتمد على:", options: ["1NF only", "2NF only", "Both 1NF and 2NF", "Nothing"], correct: 2 },
+        { q: "Update anomaly means:", qAr: "شذوذ التحديث يعني:", options: ["Can't update", "Must update same data in multiple places", "Automatic updates", "No updates needed"], correct: 1 },
+        { q: "Good design has:", qAr: "التصميم الجيد لديه:", options: ["Redundant data", "No relationships", "Each fact stored once", "No keys"], correct: 2 }
+      ]
+    }
+  };
 
-function clearAlerts() {
-  ['loginAlert','regAlert'].forEach(id => {
-    const el = document.getElementById(id);
-    if (el) el.innerHTML = '';
-  });
-}
-
-function alert_(id, msg, type='err') {
-  const el = document.getElementById(id);
-  const icon = type === 'err' ? '❌' : '✅';
-  el.innerHTML = `<div class="alert alert-${type==='err'?'err':'ok'}">${icon} ${msg}</div>`;
-}
-
-function setLoading(btnId, loading) {
-  const btn = document.getElementById(btnId);
-  btn.disabled = loading;
-  btn.innerHTML = loading
-    ? '<div class="spinner"></div> Please wait…'
-    : btn.id === 'loginBtn' ? 'Sign In | تسجيل الدخول' : 'Register | إنشاء الحساب';
-}
-
-function getInitialProgress() {
-  const p = {};
-  for (let i = 1; i <= 12; i++) p[`week${i}`] = { completed: false, score: 0 };
-  return p;
-}
-
-function saveSession(user) {
-  localStorage.setItem('taif_db_current_user', JSON.stringify(user));
-}
-
-function goToCourse() {
-  const p = window.location.pathname.replace(/\/[^\/]*$/, '/');
-  window.location.href = window.location.origin + p + 'course-details.html?code=5021201-4&name=%D8%A3%D8%B3%D8%A7%D8%B3%D9%8A%D8%A7%D8%AA%20%D9%82%D9%88%D8%A7%D8%B9%D8%AF%20%D8%A7%D9%84%D8%A8%D9%8A%D8%A7%D9%86%D8%A7%D8%AA';
-}
-
-async function doLogin() {
-  const num = document.getElementById('loginNum').value.trim();
-  const pass = document.getElementById('loginPass').value;
-  if (!num || !pass) return alert_('loginAlert', 'Please fill in all fields');
-  
-  setLoading('loginBtn', true);
-  const { data, error } = await sb.from('students').select('*').eq('student_number', num).single();
-  setLoading('loginBtn', false);
-
-  if (error || !data) return alert_('loginAlert', 'Student number not found');
-  if (data.password !== pass) return alert_('loginAlert', 'Incorrect password');
-
-  saveSession(mapUser(data));
-  showSuccess(mapUser(data), false);
-}
-
-async function doRegister() {
-  const name = document.getElementById('regName').value.trim();
-  const num = document.getElementById('regNum').value.trim();
-  const section = document.getElementById('regSection').value;
-  const pass = document.getElementById('regPass').value;
-  const pass2 = document.getElementById('regPass2').value;
-
-  if (!name || !num || !pass || !pass2) return alert_('regAlert', 'Fill all fields');
-  if (!/^\d{8}$/.test(num)) return alert_('regAlert', 'ID must be 8 digits');
-  if (pass !== pass2) return alert_('regAlert', 'Passwords do not match');
-
-  setLoading('regBtn', true);
-  const { data: existing } = await sb.from('students').select('id').eq('student_number', num).single();
-
-  if (existing) {
-    setLoading('regBtn', false);
-    return alert_('regAlert', 'ID already registered');
+  const week = weekData[weekNum];
+  if (!week) {
+    return (
+      <div className="min-h-screen bg-slate-900 text-white flex items-center justify-center">
+        <div className="text-center">
+          <p className="text-2xl mb-4">Week {weekNum} not found</p>
+          <button onClick={() => onNavigate('home')} className="px-6 py-2 bg-amber-600 rounded-lg">
+            Back to Home
+          </button>
+        </div>
+      </div>
+    );
   }
 
-  const newStudent = {
-    student_name: name, student_number: num, section_number: section,
-    password: pass, progress: getInitialProgress(), total_score: 0,
-    overall_grade: 'N/A', registered_at: new Date().toISOString()
+  const totalSteps = week.content.length + (week.video ? 1 : 0) + 1; // video + content + summary
+
+  const handleAnswerSelect = (questionIndex, answerIndex) => {
+    if (!exerciseSubmitted) {
+      setExerciseAnswers({ ...exerciseAnswers, [questionIndex]: answerIndex });
+    }
   };
 
-  const { data, error } = await sb.from('students').insert([newStudent]).select().single();
-  setLoading('regBtn', false);
-
-  if (error) return alert_('regAlert', 'Registration failed');
-
-  saveSession(mapUser(data));
-  showSuccess(mapUser(data), true);
-}
-
-function mapUser(row) {
-  return {
-    id: row.id, studentName: row.student_name, studentNumber: row.student_number,
-    sectionNumber: row.section_number, progress: row.progress || getInitialProgress(),
-    totalScore: row.total_score || 0, overallGrade: row.overall_grade || 'N/A'
+  const handleSubmitExercise = () => {
+    let correct = 0;
+    week.exercises.forEach((ex, i) => {
+      if (exerciseAnswers[i] === ex.correct) correct++;
+    });
+    const score = Math.round((correct / week.exercises.length) * 100);
+    setExerciseScore(score);
+    setExerciseSubmitted(true);
+    onExerciseComplete(weekNum, score);
   };
-}
 
-function showSuccess(user, isNew) {
-  document.getElementById('successName').textContent = isNew ? `Welcome, ${user.studentName}!` : `Welcome back, ${user.studentName}!`;
-  document.getElementById('successInfo').innerHTML = `ID: ${user.studentNumber} | Section: ${user.sectionNumber}`;
-  show('successView');
-  setTimeout(goToCourse, 3000);
-}
+  const renderContent = () => {
+    if (showExercise) {
+      return (
+        <div className="p-6">
+          <h2 className="text-2xl font-bold text-white mb-6 text-center">
+            📝 Week {weekNum} Exercise | تمرين الأسبوع {weekNum}
+          </h2>
 
-document.addEventListener('keydown', e => {
-  if (e.key !== 'Enter') return;
-  const active = document.querySelector('.view.active');
-  if (active.id === 'loginView') doLogin();
-  if (active.id === 'registerView') doRegister();
-});
-</script>
+          {exerciseSubmitted ? (
+            <div className="max-w-2xl mx-auto text-center">
+              <div className={`text-6xl mb-4 ${exerciseScore >= 80 ? '🎉' : exerciseScore >= 60 ? '👍' : '📚'}`}>
+                {exerciseScore >= 80 ? '🎉' : exerciseScore >= 60 ? '👍' : '📚'}
+              </div>
+              <h3 className="text-3xl font-bold mb-2">
+                <span className={exerciseScore >= 80 ? 'text-emerald-400' : exerciseScore >= 60 ? 'text-amber-400' : 'text-red-400'}>
+                  {exerciseScore}%
+                </span>
+              </h3>
+              <p className="text-slate-400 mb-6">
+                {exerciseScore >= 80 ? 'Excellent! Great job!' : exerciseScore >= 60 ? 'Good work! Keep practicing.' : 'Keep studying and try again!'}
+              </p>
 
+              <div className="space-y-4 text-left mb-8">
+                {week.exercises.map((ex, i) => (
+                  <div key={i} className={`p-4 rounded-lg ${exerciseAnswers[i] === ex.correct ? 'bg-emerald-900/30 border border-emerald-500/50' : 'bg-red-900/30 border border-red-500/50'}`}>
+                    <p className="text-white font-medium mb-2">{i + 1}. {ex.q}</p>
+                    <p className="text-sm text-slate-400">Your answer: {ex.options[exerciseAnswers[i]] || 'Not answered'}</p>
+                    {exerciseAnswers[i] !== ex.correct && (
+                      <p className="text-sm text-emerald-400">Correct: {ex.options[ex.correct]}</p>
+                    )}
+                  </div>
+                ))}
+              </div>
+
+              <div className="flex gap-4">
+                <button onClick={() => { setShowExercise(false); setCurrentStep(0); setExerciseAnswers({}); setExerciseSubmitted(false); }} className="flex-1 py-3 bg-slate-700 hover:bg-slate-600 text-white rounded-xl">
+                  Review Lesson
+                </button>
+                <button onClick={() => onNavigate('home')} className="flex-1 py-3 bg-amber-600 hover:bg-amber-500 text-white rounded-xl">
+                  Back to Course
+                </button>
+              </div>
+            </div>
+          ) : (
+            <div className="max-w-2xl mx-auto space-y-6">
+              {week.exercises.map((ex, i) => (
+                <div key={i} className="bg-slate-800/50 rounded-xl p-6 border border-slate-700">
+                  <p className="text-white font-medium mb-1">{i + 1}. {ex.q}</p>
+                  <p className="text-amber-300/70 text-sm font-arabic mb-4" dir="rtl">{ex.qAr}</p>
+                  <div className="space-y-2">
+                    {ex.options.map((opt, j) => (
+                      <button key={j} onClick={() => handleAnswerSelect(i, j)} className={`w-full text-left px-4 py-3 rounded-lg transition-all ${exerciseAnswers[i] === j ? 'bg-amber-600 text-white' : 'bg-slate-700 text-slate-300 hover:bg-slate-600'}`}>
+                        {opt}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              ))}
+              <button onClick={handleSubmitExercise} disabled={Object.keys(exerciseAnswers).length < week.exercises.length} className="w-full py-4 bg-emerald-600 hover:bg-emerald-500 disabled:bg-slate-700 disabled:text-slate-500 text-white font-bold rounded-xl">
+                Submit Answers | تسليم الإجابات
+              </button>
+            </div>
+          )}
+        </div>
+      );
+    }
+
+    // Video step (step 0 if video exists)
+    if (week.video && currentStep === 0) {
+      return (
+        <div className="p-6">
+          <div className="text-center mb-6">
+            <span className="px-3 py-1 bg-red-600/30 rounded-full text-red-300 text-sm">
+              🎬 Video Tutorial
+            </span>
+            <h2 className="text-2xl font-bold text-white mt-4 mb-1">{week.video.title}</h2>
+            <p className="text-amber-300/70 font-arabic">{week.video.titleAr}</p>
+          </div>
+
+          <div className="max-w-4xl mx-auto">
+            <div className="aspect-video bg-slate-800 rounded-xl overflow-hidden border border-slate-600 mb-4">
+              <iframe
+                className="w-full h-full"
+                src={`https://www.youtube.com/embed/${week.video.youtubeId}`}
+                title={week.video.title}
+                frameBorder="0"
+                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                allowFullScreen
+              ></iframe>
+            </div>
+            <div className="bg-slate-700/30 rounded-xl p-4">
+              <p className="text-slate-300">{week.video.description}</p>
+            </div>
+          </div>
+        </div>
+      );
+    }
+
+    const contentIndex = week.video ? currentStep - 1 : currentStep;
+
+    if (contentIndex >= 0 && contentIndex < week.content.length) {
+      const content = week.content[contentIndex];
+      return (
+        <div className="p-6">
+          <div className="text-center mb-6">
+            <span className="px-3 py-1 bg-blue-600/30 rounded-full text-blue-300 text-sm">
+              {content.type === 'sql' ? '💻 SQL' : content.type === 'hands-on' ? '🛠️ Hands-On' : content.type === 'intro' ? '👋 Introduction' : '📖 Concept'}
+            </span>
+            <h2 className="text-2xl font-bold text-white mt-4 mb-1">{content.titleEn}</h2>
+            <p className="text-amber-300/70 font-arabic">{content.titleAr}</p>
+          </div>
+
+          <div className="max-w-3xl mx-auto">
+            {content.type === 'sql' && (
+              <>
+                <div className="bg-slate-900 rounded-xl overflow-hidden border border-slate-600 mb-4">
+                  <div className="bg-slate-800 px-4 py-2 flex items-center gap-2">
+                    <div className="flex gap-1.5">
+                      <div className="w-3 h-3 rounded-full bg-red-500" />
+                      <div className="w-3 h-3 rounded-full bg-yellow-500" />
+                      <div className="w-3 h-3 rounded-full bg-green-500" />
+                    </div>
+                    <span className="text-slate-400 text-sm">SQL</span>
+                  </div>
+                  <pre className="p-6 text-cyan-300 font-mono text-sm overflow-x-auto whitespace-pre-wrap">
+                    {content.code}
+                  </pre>
+                </div>
+                <div className="bg-slate-700/30 rounded-xl p-4 space-y-2">
+                  <p className="text-slate-300">{content.explanation}</p>
+                  {content.explanationAr && <p className="text-slate-400 font-arabic" dir="rtl">{content.explanationAr}</p>}
+                </div>
+              </>
+            )}
+
+            {(content.type === 'concept' || content.type === 'intro') && (
+              <div className="space-y-4">
+                <div className="bg-slate-700/30 rounded-xl p-6">
+                  <p className="text-lg text-slate-200 mb-4">{content.contentEn}</p>
+                  <p className="text-lg text-slate-400 font-arabic" dir="rtl">{content.contentAr}</p>
+                </div>
+                {content.keyPoints && (
+                  <div className="bg-slate-800/50 rounded-xl p-6 border border-slate-700">
+                    <h3 className="text-amber-400 font-semibold mb-4">Key Points | النقاط الرئيسية</h3>
+                    <div className="space-y-3">
+                      {content.keyPoints.map((point, i) => (
+                        <div key={i} className="flex items-start gap-3">
+                          <span className="text-amber-500 mt-1">•</span>
+                          <div>
+                            <p className="text-slate-200">{point.en}</p>
+                            <p className="text-slate-400 text-sm font-arabic" dir="rtl">{point.ar}</p>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
+              </div>
+            )}
+
+            {content.type === 'hands-on' && content.steps && (
+              <div className="space-y-3">
+                {content.steps.map((step, i) => (
+                  <div key={i} className="flex items-start gap-4 bg-slate-700/30 rounded-lg p-4">
+                    <div className="w-8 h-8 bg-emerald-600 rounded-full flex items-center justify-center text-white font-bold flex-shrink-0">
+                      {i + 1}
+                    </div>
+                    <div>
+                      <p className="text-white">{typeof step === 'string' ? step : step.en}</p>
+                      {typeof step === 'object' && step.ar && (
+                        <p className="text-slate-400 text-sm font-arabic mt-1" dir="rtl">{step.ar}</p>
+                      )}
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+        </div>
+      );
+    }
+
+    // Summary step
+    return (
+      <div className="p-6 text-center">
+        <span className="text-5xl block mb-4">✅</span>
+        <h2 className="text-2xl font-bold text-white mb-2">Lesson Complete!</h2>
+        <p className="text-amber-300/70 font-arabic mb-6">اكتمل الدرس!</p>
+        
+        <div className="max-w-md mx-auto">
+          <p className="text-slate-400 mb-6">
+            Now take the exercise to test your knowledge and earn your grade!
+          </p>
+          <button
+            onClick={() => setShowExercise(true)}
+            className="w-full py-4 bg-gradient-to-r from-emerald-600 to-emerald-500 hover:from-emerald-500 hover:to-emerald-400 text-white font-bold rounded-xl text-lg"
+          >
+            📝 Start Exercise | ابدأ التمرين
+          </button>
+        </div>
+      </div>
+    );
+  };
+
+  return (
+    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 text-white flex flex-col">
+      {/* Header */}
+      <header className="bg-slate-800/80 backdrop-blur border-b border-slate-700 sticky top-0 z-50">
+        <div className="max-w-6xl mx-auto px-4 py-3 flex items-center justify-between">
+          <div className="flex items-center gap-3">
+            <button
+              onClick={() => onNavigate('home')}
+              className="px-3 py-2 bg-slate-700 hover:bg-slate-600 rounded-lg text-sm"
+            >
+              ← Back
+            </button>
+            <div>
+              <h1 className="font-bold text-white">Week {weekNum}: {week.titleEn}</h1>
+              <p className="text-xs text-amber-300/70 font-arabic">{week.titleAr}</p>
+            </div>
+          </div>
+          <span className="text-3xl">{week.icon}</span>
+        </div>
+      </header>
+
+      {/* Progress */}
+      {!showExercise && (
+        <div className="bg-slate-800/50 border-b border-slate-700">
+          <div className="max-w-6xl mx-auto px-4 py-2">
+            <div className="flex items-center justify-between text-sm text-slate-400 mb-1">
+              <span>Step {currentStep + 1} of {totalSteps}</span>
+              <span>{Math.round(((currentStep + 1) / totalSteps) * 100)}%</span>
+            </div>
+            <div className="h-2 bg-slate-700 rounded-full overflow-hidden">
+              <div 
+                className="h-full bg-gradient-to-r from-amber-500 to-amber-400 transition-all"
+                style={{ width: `${((currentStep + 1) / totalSteps) * 100}%` }}
+              />
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Content */}
+      <div className="flex-1 max-w-6xl mx-auto w-full overflow-y-auto">
+        {renderContent()}
+      </div>
+
+      {/* Navigation */}
+      {!showExercise && (
+        <div className="bg-slate-800/80 border-t border-slate-700 p-4 sticky bottom-0">
+          <div className="max-w-6xl mx-auto flex justify-between">
+            <button
+              onClick={() => setCurrentStep(Math.max(0, currentStep - 1))}
+              disabled={currentStep === 0}
+              className={`px-6 py-2 rounded-lg ${currentStep === 0 ? 'bg-slate-700 text-slate-500' : 'bg-slate-700 text-white hover:bg-slate-600'}`}
+            >
+              ← Previous
+            </button>
+            
+            {currentStep < totalSteps - 1 ? (
+              <button
+                onClick={() => setCurrentStep(currentStep + 1)}
+                className="px-6 py-2 bg-amber-600 hover:bg-amber-500 text-white rounded-lg"
+              >
+                Next →
+              </button>
+            ) : (
+              <button
+                onClick={() => setShowExercise(true)}
+                className="px-6 py-2 bg-emerald-600 hover:bg-emerald-500 text-white rounded-lg"
+              >
+                📝 Take Exercise
+              </button>
+            )}
+          </div>
+        </div>
+      )}
+    </div>
+  );
+};
+
+
+    // ---- App ----
+
+const App = () => {
+  const [currentPage, setCurrentPage] = useState('login');
+  const [currentUser, setCurrentUser] = useState(null);
+  const [students, setStudents] = useState([]);
+  const [isAdmin, setIsAdmin] = useState(false);
+  const [loading, setLoading] = useState(true);
+
+  // Load students from Supabase on mount
+  useEffect(() => {
+    const initApp = async () => {
+      await loadStudents();
+      
+      // Check for saved user session
+      try {
+        const savedUser = localStorage.getItem('taif_db_current_user');
+        if (savedUser) {
+          const parsedUser = JSON.parse(savedUser);
+          // Verify user still exists in database
+          const { data: verifiedUser, error } = await supabase
+            .from('students')
+            .select('*')
+            .eq('id', parsedUser.id)
+            .single();
+          
+          if (verifiedUser && !error) {
+            // Update with fresh data from database
+            const freshUser = {
+              id: verifiedUser.id,
+              studentNumber: verifiedUser.student_number,
+              studentName: verifiedUser.student_name,
+              password: verifiedUser.password,
+              sectionNumber: verifiedUser.section_number,
+              progress: verifiedUser.progress || getInitialProgress(),
+              totalScore: verifiedUser.total_score || 0,
+              overallGrade: verifiedUser.overall_grade || 'N/A',
+              registeredAt: verifiedUser.registered_at
+            };
+            setCurrentUser(freshUser);
+            localStorage.setItem('taif_db_current_user', JSON.stringify(freshUser));
+            setCurrentPage('home');
+          } else {
+            // Clear invalid session
+            localStorage.removeItem('taif_db_current_user');
+          }
+        }
+      } catch (err) {
+        console.error('Error restoring session:', err);
+        localStorage.removeItem('taif_db_current_user');
+      }
+      
+      setLoading(false);
+    };
+    
+    initApp();
+  }, []);
+
+  // Load all students from Supabase
+  const loadStudents = async () => {
+    try {
+      const { data, error } = await supabase
+        .from('students')
+        .select('*')
+        .order('registered_at', { ascending: false });
+
+      if (error) {
+        console.error('Error loading students:', error);
+        return;
+      }
+
+      // Transform data to match our app structure
+      const transformedStudents = data.map(student => ({
+        id: student.id,
+        studentNumber: student.student_number,
+        studentName: student.student_name,
+        password: student.password,
+        sectionNumber: student.section_number,
+        progress: student.progress || getInitialProgress(),
+        totalScore: student.total_score || 0,
+        overallGrade: student.overall_grade || 'N/A',
+        registeredAt: student.registered_at
+      }));
+
+      setStudents(transformedStudents);
+      console.log('Loaded', transformedStudents.length, 'students from Supabase');
+    } catch (err) {
+      console.error('Failed to load students:', err);
+    }
+  };
+
+  // Get initial progress structure
+  const getInitialProgress = () => ({
+    week1: { completed: false, score: 0, attempts: 0 },
+    week2: { completed: false, score: 0, attempts: 0 },
+    week3: { completed: false, score: 0, attempts: 0 },
+    week4: { completed: false, score: 0, attempts: 0 },
+    week5: { completed: false, score: 0, attempts: 0 },
+    week6: { completed: false, score: 0, attempts: 0 },
+    week7: { completed: false, score: 0, attempts: 0 },
+    week8: { completed: false, score: 0, attempts: 0 },
+    week9: { completed: false, score: 0, attempts: 0 },
+    week10: { completed: false, score: 0, attempts: 0 },
+    week11: { completed: false, score: 0, attempts: 0 },
+    week12: { completed: false, score: 0, attempts: 0 },
+    week13: { completed: false, score: 0, attempts: 0 },
+  });
+
+  // Save current user to localStorage
+  useEffect(() => {
+    if (currentUser) {
+      localStorage.setItem('taif_db_current_user', JSON.stringify(currentUser));
+    }
+  }, [currentUser]);
+
+  const handleNavigate = (page) => {
+    setCurrentPage(page);
+    window.scrollTo(0, 0);
+  };
+
+  const handleRegister = async (studentData) => {
+    try {
+      // Check if student number already exists
+      const { data: existing, error: checkError } = await supabase
+        .from('students')
+        .select('student_number')
+        .eq('student_number', studentData.studentNumber)
+        .maybeSingle();
+
+      if (existing) {
+        return { success: false, message: 'Student number already registered! | الرقم الجامعي مسجل بالفعل!' };
+      }
+
+      // Insert new student into Supabase
+      const { data, error } = await supabase
+        .from('students')
+        .insert([{
+          student_number: studentData.studentNumber,
+          student_name: studentData.studentName,
+          password: studentData.password,
+          section_number: studentData.sectionNumber,
+          progress: getInitialProgress(),
+          total_score: 0,
+          overall_grade: 'N/A'
+        }])
+        .select()
+        .single();
+
+      if (error) {
+        console.error('Registration error:', error);
+        return { success: false, message: 'Registration failed. Please try again. | فشل التسجيل. حاول مرة أخرى.' };
+      }
+
+      // Reload students list
+      await loadStudents();
+
+      return { success: true, message: 'Registration successful! | تم التسجيل بنجاح!' };
+    } catch (err) {
+      console.error('Registration error:', err);
+      return { success: false, message: 'Registration failed. Please try again. | فشل التسجيل. حاول مرة أخرى.' };
+    }
+  };
+
+  const handleLogin = async (studentNumber, password) => {
+    // Admin login check
+    if (studentNumber === 'admin' && password === 'Saad@1234') {
+      setIsAdmin(true);
+      await loadStudents(); // Refresh students list for admin
+      setCurrentPage('admin');
+      return { success: true };
+    }
+
+    try {
+      // Find student in Supabase
+      const { data: student, error } = await supabase
+        .from('students')
+        .select('*')
+        .eq('student_number', studentNumber)
+        .eq('password', password)
+        .maybeSingle();
+
+      if (error) {
+        console.error('Login query error:', error);
+        return { success: false, message: 'Login failed. Please try again. | فشل تسجيل الدخول. حاول مرة أخرى.' };
+      }
+
+      if (!student) {
+        return { success: false, message: 'Invalid student number or password! | الرقم الجامعي أو كلمة المرور غير صحيحة!' };
+      }
+
+      // Transform to app structure
+      const transformedStudent = {
+        id: student.id,
+        studentNumber: student.student_number,
+        studentName: student.student_name,
+        password: student.password,
+        sectionNumber: student.section_number,
+        progress: student.progress || getInitialProgress(),
+        totalScore: student.total_score || 0,
+        overallGrade: student.overall_grade || 'N/A',
+        registeredAt: student.registered_at
+      };
+
+      setCurrentUser(transformedStudent);
+      setCurrentPage('home');
+      return { success: true };
+    } catch (err) {
+      console.error('Login error:', err);
+      return { success: false, message: 'Login failed. Please try again. | فشل تسجيل الدخول. حاول مرة أخرى.' };
+    }
+  };
+
+  const handleLogout = () => {
+    setCurrentUser(null);
+    setIsAdmin(false);
+    localStorage.removeItem('taif_db_current_user');
+    setCurrentPage('login');
+  };
+
+  const calculateGrade = (score) => {
+    if (score >= 90) return 'A+';
+    if (score >= 85) return 'A';
+    if (score >= 80) return 'B+';
+    if (score >= 75) return 'B';
+    if (score >= 70) return 'C+';
+    if (score >= 65) return 'C';
+    if (score >= 60) return 'D+';
+    if (score >= 50) return 'D';
+    return 'F';
+  };
+
+  const handleExerciseComplete = async (weekNum, score) => {
+    if (!currentUser) return;
+
+    const weekKey = `week${weekNum}`;
+    
+    // Calculate new progress
+    const newProgress = {
+      ...currentUser.progress,
+      [weekKey]: {
+        completed: true,
+        score: Math.max(currentUser.progress[weekKey]?.score || 0, score),
+        attempts: (currentUser.progress[weekKey]?.attempts || 0) + 1,
+        completedAt: new Date().toISOString()
+      }
+    };
+
+    // Calculate total score (average of all completed weeks)
+    const completedWeeks = Object.values(newProgress).filter(w => w.completed);
+    const totalScore = completedWeeks.length > 0
+      ? Math.round(completedWeeks.reduce((sum, w) => sum + w.score, 0) / completedWeeks.length)
+      : 0;
+    const overallGrade = calculateGrade(totalScore);
+
+    try {
+      // Update in Supabase
+      const { error } = await supabase
+        .from('students')
+        .update({
+          progress: newProgress,
+          total_score: totalScore,
+          overall_grade: overallGrade
+        })
+        .eq('id', currentUser.id);
+
+      if (error) {
+        console.error('Error updating progress:', error);
+        return;
+      }
+
+      // Update local state
+      const updatedUser = {
+        ...currentUser,
+        progress: newProgress,
+        totalScore,
+        overallGrade
+      };
+
+      setCurrentUser(updatedUser);
+
+      // Update students list
+      setStudents(students.map(s => 
+        s.id === currentUser.id ? updatedUser : s
+      ));
+
+    } catch (err) {
+      console.error('Error updating progress:', err);
+    }
+  };
+
+  // Loading screen
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-amber-900/30 flex items-center justify-center">
+        <div className="text-center">
+          <div className="w-16 h-16 border-4 border-amber-500 border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
+          <p className="text-white text-lg">Loading...</p>
+        </div>
+      </div>
+    );
+  }
+
+  const renderPage = () => {
+    // Admin dashboard
+    if (isAdmin && currentPage === 'admin') {
+      return <AdminDashboard students={students} onNavigate={handleNavigate} onLogout={handleLogout} onRefresh={loadStudents} />;
+    }
+
+    if (!currentUser && currentPage !== 'login' && currentPage !== 'register') {
+      return <LoginPage onNavigate={handleNavigate} onLogin={handleLogin} />;
+    }
+
+    switch (currentPage) {
+      case 'login':
+        return <LoginPage onNavigate={handleNavigate} onLogin={handleLogin} />;
+      case 'register':
+        return <RegisterPage onNavigate={handleNavigate} onRegister={handleRegister} />;
+      case 'home':
+        return <HomePage user={currentUser} onNavigate={handleNavigate} onLogout={handleLogout} />;
+      case 'profile':
+        return <ProfilePage user={currentUser} onNavigate={handleNavigate} onLogout={handleLogout} />;
+      case 'week1':
+      case 'week2':
+      case 'week3':
+      case 'week4':
+      case 'week5':
+      case 'week6':
+      case 'week7':
+      case 'week8':
+      case 'week9':
+      case 'week10':
+      case 'week11':
+      case 'week12':
+      case 'week13':
+        const weekNum = parseInt(currentPage.replace('week', ''));
+        return (
+          <WeekLesson 
+            weekNum={weekNum} 
+            user={currentUser}
+            onNavigate={handleNavigate} 
+            onExerciseComplete={handleExerciseComplete}
+            onLogout={handleLogout}
+          />
+        );
+      default:
+        return <HomePage user={currentUser} onNavigate={handleNavigate} onLogout={handleLogout} />;
+    }
+  };
+
+  return (
+    <div className="min-h-screen">
+      {renderPage()}
+    </div>
+  );
+};
+
+
+    // ============================================================
+    //  Mount
+    // ============================================================
+    const root = ReactDOM.createRoot(document.getElementById('root'));
+    root.render(<App />);
+  </script>
 </body>
 </html>
